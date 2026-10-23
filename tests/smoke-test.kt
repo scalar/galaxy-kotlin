@@ -14,10 +14,10 @@ import com.scalar.galaxy.models.celestialBodies.CelestialBodyCreateParams
 import com.scalar.galaxy.models.planets.Planet
 import com.scalar.galaxy.models.planets.PlanetCreateParams
 import com.scalar.galaxy.models.planets.PlanetDeleteParams
-import com.scalar.galaxy.models.planets.PlanetDelteImageParams
-import com.scalar.galaxy.models.planets.PlanetListAllDataParams
+import com.scalar.galaxy.models.planets.PlanetListParams
 import com.scalar.galaxy.models.planets.PlanetRetrieveParams
 import com.scalar.galaxy.models.planets.PlanetUpdateParams
+import com.scalar.galaxy.models.planets.PlanetUploadImageParams
 import java.nio.file.Files
 import java.nio.file.Path
 import java.time.Duration
@@ -49,8 +49,8 @@ private data class SmokeCase(
 )
 
 private fun _smokeCase0() {
-    val params = PlanetListAllDataParams.builder().limit(10L).offset(0L).build()
-    val planet = client.planets().listAllData(params)
+    val params = PlanetListParams.builder().limit(10L).offset(0L).build()
+    val planet = client.planets().list(params)
 }
 
 private fun _smokeCase1() {
@@ -79,17 +79,17 @@ private fun _smokeCase4() {
 }
 
 private fun _smokeCase5() {
-    val params = PlanetDelteImageParams.builder().planetId(1L).build()
-    val planet = client.planets().delteImage(params)
+    val params = PlanetUploadImageParams.builder().planetId(1L).build()
+    val planet = client.planets().uploadImage(params)
 }
 
 private fun _smokeCase6() {
     val params =
-        PlanetDelteImageParams.builder()
+        PlanetUploadImageParams.builder()
             .planetId(1L)
             .image(java.io.ByteArrayInputStream(ByteArray(0)))
             .build()
-    val planet = client.planets().delteImage(params)
+    val planet = client.planets().uploadImage(params)
 }
 
 private fun _smokeCase7() {
@@ -126,15 +126,15 @@ private fun _smokeCase10() {
 
 private fun _smokeCase11() {
     runBlocking {
-        val params = PlanetListAllDataParams.builder().limit(10L).offset(0L).build()
-        val planet = client.async().planets().listAllData(params)
+        val params = PlanetListParams.builder().limit(10L).offset(0L).build()
+        val planet = client.async().planets().list(params)
     }
 }
 
 private val cases =
     listOf(
         SmokeCase(
-            operation = "listAllData",
+            operation = "list",
             method = "GET",
             path = "/planets",
             run = ::_smokeCase0,
@@ -164,14 +164,14 @@ private val cases =
             run = ::_smokeCase4,
         ),
         SmokeCase(
-            operation = "delteImage",
+            operation = "uploadImage",
             method = "POST",
             path = "/planets/{planetId}/image",
             label = "required params",
             run = ::_smokeCase5,
         ),
         SmokeCase(
-            operation = "delteImage",
+            operation = "uploadImage",
             method = "POST",
             path = "/planets/{planetId}/image",
             label = "all params",
@@ -202,7 +202,7 @@ private val cases =
             run = ::_smokeCase10,
         ),
         SmokeCase(
-            operation = "listAllData",
+            operation = "list",
             method = "GET",
             path = "/planets",
             label = "async client",

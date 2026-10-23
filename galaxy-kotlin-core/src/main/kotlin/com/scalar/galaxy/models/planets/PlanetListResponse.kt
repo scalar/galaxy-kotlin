@@ -21,7 +21,7 @@ import java.util.Objects
  * `$dynamicAnchor` named `itemType`, the JSON Schema 2020-12 way to express `PaginatedResource<T>`.
  */
 @com.fasterxml.jackson.annotation.JsonPropertyOrder("data", "meta")
-class PlanetListAllDataResponse
+class PlanetListResponse
 @JsonCreator(mode = JsonCreator.Mode.DISABLED)
 private constructor(
     private val data: JsonField<List<JsonValue>>,
@@ -75,23 +75,21 @@ private constructor(
 
     companion object {
 
-        /**
-         * Returns a mutable builder for constructing an instance of [PlanetListAllDataResponse].
-         */
+        /** Returns a mutable builder for constructing an instance of [PlanetListResponse]. */
         fun builder() = Builder()
     }
 
-    /** A builder for [PlanetListAllDataResponse]. */
+    /** A builder for [PlanetListResponse]. */
     class Builder internal constructor() {
 
         private var data: JsonField<MutableList<JsonValue>>? = null
         private var meta: JsonField<Meta> = JsonMissing.of()
         private var additionalProperties: MutableMap<String, JsonValue> = mutableMapOf()
 
-        internal fun from(planetListAllDataResponse: PlanetListAllDataResponse) = apply {
-            data = planetListAllDataResponse.data.map { it.toMutableList() }
-            meta = planetListAllDataResponse.meta
-            additionalProperties = planetListAllDataResponse.additionalProperties.toMutableMap()
+        internal fun from(planetListResponse: PlanetListResponse) = apply {
+            data = planetListResponse.data.map { it.toMutableList() }
+            meta = planetListResponse.meta
+            additionalProperties = planetListResponse.additionalProperties.toMutableMap()
         }
 
         fun data(data: List<JsonValue>) = data(JsonField.of(data))
@@ -149,12 +147,12 @@ private constructor(
         }
 
         /**
-         * Returns an immutable instance of [PlanetListAllDataResponse].
+         * Returns an immutable instance of [PlanetListResponse].
          *
          * Further updates to this [Builder] will not mutate the returned instance.
          */
-        fun build(): PlanetListAllDataResponse =
-            PlanetListAllDataResponse(
+        fun build(): PlanetListResponse =
+            PlanetListResponse(
                 (data ?: JsonMissing.of()).map { it.toImmutable() },
                 meta,
                 additionalProperties.toMutableMap(),
@@ -171,7 +169,7 @@ private constructor(
      * @throws GalaxyInvalidDataException if any value type in this object doesn't match its
      *   expected type.
      */
-    fun validate(): PlanetListAllDataResponse = apply {
+    fun validate(): PlanetListResponse = apply {
         if (validated) {
             return@apply
         }
@@ -445,7 +443,7 @@ private constructor(
             return true
         }
 
-        return other is PlanetListAllDataResponse &&
+        return other is PlanetListResponse &&
             data == other.data &&
             meta == other.meta &&
             additionalProperties == other.additionalProperties
@@ -456,5 +454,5 @@ private constructor(
     override fun hashCode(): Int = hashCode
 
     override fun toString() =
-        "PlanetListAllDataResponse{data=$data, meta=$meta, additionalProperties=$additionalProperties}"
+        "PlanetListResponse{data=$data, meta=$meta, additionalProperties=$additionalProperties}"
 }
