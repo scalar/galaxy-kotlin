@@ -12,7 +12,7 @@ Generated Kotlin client for Scalar Galaxy API, published as `com.scalar.galaxy`.
 Add the dependency to your Gradle build:
 
 ```kotlin
-implementation("com.scalar.galaxy:galaxy-kotlin:0.2.0") // x-release-please-version
+implementation("com.scalar.galaxy:galaxy-kotlin:0.3.0") // x-release-please-version
 ```
 
 Or declare it in your Maven `pom.xml`:
@@ -21,7 +21,7 @@ Or declare it in your Maven `pom.xml`:
 <dependency>
   <groupId>com.scalar.galaxy</groupId>
   <artifactId>galaxy-kotlin</artifactId>
-  <version>0.2.0</version> <!-- x-release-please-version -->
+  <version>0.3.0</version> <!-- x-release-please-version -->
 </dependency>
 ```
 
@@ -57,13 +57,13 @@ Provide credentials using the options below. Environment variables are read auto
 ```kotlin
 import com.scalar.galaxy.client.GalaxyClient
 import com.scalar.galaxy.client.okhttp.GalaxyOkHttpClient
-import com.scalar.galaxy.models.planets.PlanetListAllDataParams
+import com.scalar.galaxy.models.planets.PlanetListParams
 
 val client: GalaxyClient =
     GalaxyOkHttpClient.builder().bearerAuth(System.getenv("BEARER_AUTH")).build()
 
-val params = PlanetListAllDataParams.builder().limit(10L).offset(0L).build()
-val planet = client.planets().listAllData(params)
+val params = PlanetListParams.builder().limit(10L).offset(0L).build()
+val planet = client.planets().list(params)
 
 println(planet)
 ```
@@ -78,8 +78,8 @@ Non-success responses throw generated API errors. Error objects expose status, h
 import com.scalar.galaxy.errors.GalaxyServiceException
 
 try {
-    val params = PlanetListAllDataParams.builder().limit(10L).offset(0L).build()
-    val planet = client.planets().listAllData(params)
+    val params = PlanetListParams.builder().limit(10L).offset(0L).build()
+    val planet = client.planets().list(params)
 } catch (err: GalaxyServiceException) {
     println("${err.statusCode()} ${err.body()}")
     throw err

@@ -22,7 +22,7 @@ import java.util.Objects
     "mimeType",
     "uploadedAt",
 )
-class PlanetDelteImageResponse
+class PlanetUploadImageResponse
 @JsonCreator(mode = JsonCreator.Mode.DISABLED)
 private constructor(
     private val fileSize: JsonField<Long>,
@@ -133,11 +133,13 @@ private constructor(
 
     companion object {
 
-        /** Returns a mutable builder for constructing an instance of [PlanetDelteImageResponse]. */
+        /**
+         * Returns a mutable builder for constructing an instance of [PlanetUploadImageResponse].
+         */
         fun builder() = Builder()
     }
 
-    /** A builder for [PlanetDelteImageResponse]. */
+    /** A builder for [PlanetUploadImageResponse]. */
     class Builder internal constructor() {
 
         private var fileSize: JsonField<Long> = JsonMissing.of()
@@ -147,13 +149,13 @@ private constructor(
         private var uploadedAt: JsonField<OffsetDateTime> = JsonMissing.of()
         private var additionalProperties: MutableMap<String, JsonValue> = mutableMapOf()
 
-        internal fun from(planetDelteImageResponse: PlanetDelteImageResponse) = apply {
-            fileSize = planetDelteImageResponse.fileSize
-            imageUrl = planetDelteImageResponse.imageUrl
-            message = planetDelteImageResponse.message
-            mimeType = planetDelteImageResponse.mimeType
-            uploadedAt = planetDelteImageResponse.uploadedAt
-            additionalProperties = planetDelteImageResponse.additionalProperties.toMutableMap()
+        internal fun from(planetUploadImageResponse: PlanetUploadImageResponse) = apply {
+            fileSize = planetUploadImageResponse.fileSize
+            imageUrl = planetUploadImageResponse.imageUrl
+            message = planetUploadImageResponse.message
+            mimeType = planetUploadImageResponse.mimeType
+            uploadedAt = planetUploadImageResponse.uploadedAt
+            additionalProperties = planetUploadImageResponse.additionalProperties.toMutableMap()
         }
 
         /** Size of the uploaded image in bytes */
@@ -233,12 +235,12 @@ private constructor(
         }
 
         /**
-         * Returns an immutable instance of [PlanetDelteImageResponse].
+         * Returns an immutable instance of [PlanetUploadImageResponse].
          *
          * Further updates to this [Builder] will not mutate the returned instance.
          */
-        fun build(): PlanetDelteImageResponse =
-            PlanetDelteImageResponse(
+        fun build(): PlanetUploadImageResponse =
+            PlanetUploadImageResponse(
                 fileSize,
                 imageUrl,
                 message,
@@ -258,7 +260,7 @@ private constructor(
      * @throws GalaxyInvalidDataException if any value type in this object doesn't match its
      *   expected type.
      */
-    fun validate(): PlanetDelteImageResponse = apply {
+    fun validate(): PlanetUploadImageResponse = apply {
         if (validated) {
             return@apply
         }
@@ -296,7 +298,7 @@ private constructor(
             return true
         }
 
-        return other is PlanetDelteImageResponse &&
+        return other is PlanetUploadImageResponse &&
             fileSize == other.fileSize &&
             imageUrl == other.imageUrl &&
             message == other.message &&
@@ -312,5 +314,5 @@ private constructor(
     override fun hashCode(): Int = hashCode
 
     override fun toString() =
-        "PlanetDelteImageResponse{fileSize=$fileSize, imageUrl=$imageUrl, message=$message, mimeType=$mimeType, uploadedAt=$uploadedAt, additionalProperties=$additionalProperties}"
+        "PlanetUploadImageResponse{fileSize=$fileSize, imageUrl=$imageUrl, message=$message, mimeType=$mimeType, uploadedAt=$uploadedAt, additionalProperties=$additionalProperties}"
 }

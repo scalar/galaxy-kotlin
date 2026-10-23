@@ -21,12 +21,12 @@ import com.scalar.galaxy.core.prepare
 import com.scalar.galaxy.models.planets.Planet
 import com.scalar.galaxy.models.planets.PlanetCreateParams
 import com.scalar.galaxy.models.planets.PlanetDeleteParams
-import com.scalar.galaxy.models.planets.PlanetDelteImageParams
-import com.scalar.galaxy.models.planets.PlanetDelteImageResponse
-import com.scalar.galaxy.models.planets.PlanetListAllDataParams
-import com.scalar.galaxy.models.planets.PlanetListAllDataResponse
+import com.scalar.galaxy.models.planets.PlanetListParams
+import com.scalar.galaxy.models.planets.PlanetListResponse
 import com.scalar.galaxy.models.planets.PlanetRetrieveParams
 import com.scalar.galaxy.models.planets.PlanetUpdateParams
+import com.scalar.galaxy.models.planets.PlanetUploadImageParams
+import com.scalar.galaxy.models.planets.PlanetUploadImageResponse
 
 /** Everything about planets */
 class PlanetServiceImpl internal constructor(private val clientOptions: ClientOptions) :
@@ -53,24 +53,24 @@ class PlanetServiceImpl internal constructor(private val clientOptions: ClientOp
         // put /planets/{planetId}
         withRawResponse().update(params, requestOptions).parse()
 
+    override fun list(
+        params: PlanetListParams,
+        requestOptions: RequestOptions,
+    ): PlanetListResponse =
+        // get /planets
+        withRawResponse().list(params, requestOptions).parse()
+
     override fun delete(params: PlanetDeleteParams, requestOptions: RequestOptions) {
         // delete /planets/{planetId}
         withRawResponse().delete(params, requestOptions)
     }
 
-    override fun delteImage(
-        params: PlanetDelteImageParams,
+    override fun uploadImage(
+        params: PlanetUploadImageParams,
         requestOptions: RequestOptions,
-    ): PlanetDelteImageResponse =
+    ): PlanetUploadImageResponse =
         // post /planets/{planetId}/image
-        withRawResponse().delteImage(params, requestOptions).parse()
-
-    override fun listAllData(
-        params: PlanetListAllDataParams,
-        requestOptions: RequestOptions,
-    ): PlanetListAllDataResponse =
-        // get /planets
-        withRawResponse().listAllData(params, requestOptions).parse()
+        withRawResponse().uploadImage(params, requestOptions).parse()
 
     class WithRawResponseImpl internal constructor(private val clientOptions: ClientOptions) :
         PlanetService.WithRawResponse {
@@ -169,6 +169,33 @@ class PlanetServiceImpl internal constructor(private val clientOptions: ClientOp
             }
         }
 
+        private val listHandler: Handler<PlanetListResponse> =
+            jsonHandler<PlanetListResponse>(clientOptions.jsonMapper)
+
+        override fun list(
+            params: PlanetListParams,
+            requestOptions: RequestOptions,
+        ): HttpResponseFor<PlanetListResponse> {
+            val request =
+                HttpRequest.builder()
+                    .method(HttpMethod.GET)
+                    .baseUrl(clientOptions.baseUrl())
+                    .addPathSegments("planets")
+                    .build()
+                    .prepare(clientOptions, params)
+            val requestOptions = requestOptions.applyDefaults(RequestOptions.from(clientOptions))
+            val response = clientOptions.httpClient.execute(request, requestOptions)
+            return errorHandler.handle(response).parseable {
+                response
+                    .use { listHandler.handle(it) }
+                    .also {
+                        if (requestOptions.responseValidation!!) {
+                            it.validate()
+                        }
+                    }
+            }
+        }
+
         private val deleteHandler: Handler<Void?> = emptyHandler()
 
         override fun delete(
@@ -193,13 +220,13 @@ class PlanetServiceImpl internal constructor(private val clientOptions: ClientOp
             }
         }
 
-        private val delteImageHandler: Handler<PlanetDelteImageResponse> =
-            jsonHandler<PlanetDelteImageResponse>(clientOptions.jsonMapper)
+        private val uploadImageHandler: Handler<PlanetUploadImageResponse> =
+            jsonHandler<PlanetUploadImageResponse>(clientOptions.jsonMapper)
 
-        override fun delteImage(
-            params: PlanetDelteImageParams,
+        override fun uploadImage(
+            params: PlanetUploadImageParams,
             requestOptions: RequestOptions,
-        ): HttpResponseFor<PlanetDelteImageResponse> {
+        ): HttpResponseFor<PlanetUploadImageResponse> {
             // We check here instead of in the params builder because this can be specified
             // positionally or in the params class.
             checkRequired("planetId", params.planetId())
@@ -215,34 +242,7 @@ class PlanetServiceImpl internal constructor(private val clientOptions: ClientOp
             val response = clientOptions.httpClient.execute(request, requestOptions)
             return errorHandler.handle(response).parseable {
                 response
-                    .use { delteImageHandler.handle(it) }
-                    .also {
-                        if (requestOptions.responseValidation!!) {
-                            it.validate()
-                        }
-                    }
-            }
-        }
-
-        private val listAllDataHandler: Handler<PlanetListAllDataResponse> =
-            jsonHandler<PlanetListAllDataResponse>(clientOptions.jsonMapper)
-
-        override fun listAllData(
-            params: PlanetListAllDataParams,
-            requestOptions: RequestOptions,
-        ): HttpResponseFor<PlanetListAllDataResponse> {
-            val request =
-                HttpRequest.builder()
-                    .method(HttpMethod.GET)
-                    .baseUrl(clientOptions.baseUrl())
-                    .addPathSegments("planets")
-                    .build()
-                    .prepare(clientOptions, params)
-            val requestOptions = requestOptions.applyDefaults(RequestOptions.from(clientOptions))
-            val response = clientOptions.httpClient.execute(request, requestOptions)
-            return errorHandler.handle(response).parseable {
-                response
-                    .use { listAllDataHandler.handle(it) }
+                    .use { uploadImageHandler.handle(it) }
                     .also {
                         if (requestOptions.responseValidation!!) {
                             it.validate()
