@@ -63,13 +63,13 @@ Or build the SDK from source, with JDK 21 installed:
 ```kotlin
 import com.scalar.galaxy.client.GalaxyClient
 import com.scalar.galaxy.client.okhttp.GalaxyOkHttpClient
-import com.scalar.galaxy.models.planets.PlanetListAllDataParams
+import com.scalar.galaxy.models.planets.PlanetListParams
 
 val client: GalaxyClient =
     GalaxyOkHttpClient.builder().bearerAuth(System.getenv("BEARER_AUTH")).build()
 
-val params = PlanetListAllDataParams.builder().limit(10L).offset(0L).build()
-val planet = client.planets().listAllData(params)
+val params = PlanetListParams.builder().limit(10L).offset(0L).build()
+val planet = client.planets().list(params)
 
 println(planet)
 ```
@@ -87,15 +87,15 @@ Use `GalaxyOkHttpClientAsync.builder()` or call `client.async()` when you want c
 ```kotlin
 import com.scalar.galaxy.client.GalaxyClientAsync
 import com.scalar.galaxy.client.okhttp.GalaxyOkHttpClientAsync
-import com.scalar.galaxy.models.planets.PlanetListAllDataParams
+import com.scalar.galaxy.models.planets.PlanetListParams
 import kotlinx.coroutines.runBlocking
 
 val client: GalaxyClientAsync =
     GalaxyOkHttpClientAsync.builder().bearerAuth(System.getenv("BEARER_AUTH")).build()
 
 runBlocking {
-    val params = PlanetListAllDataParams.builder().limit(10L).offset(0L).build()
-    val planet = client.planets().listAllData(params)
+    val params = PlanetListParams.builder().limit(10L).offset(0L).build()
+    val planet = client.planets().list(params)
 
     println(planet)
 }
@@ -250,8 +250,8 @@ Non-success responses throw generated API errors. Error objects expose status, h
 import com.scalar.galaxy.errors.GalaxyServiceException
 
 try {
-    val params = PlanetListAllDataParams.builder().limit(10L).offset(0L).build()
-    val planet = client.planets().listAllData(params)
+    val params = PlanetListParams.builder().limit(10L).offset(0L).build()
+    val planet = client.planets().list(params)
 } catch (err: GalaxyServiceException) {
     println("${err.statusCode()} ${err.body()}")
     throw err
