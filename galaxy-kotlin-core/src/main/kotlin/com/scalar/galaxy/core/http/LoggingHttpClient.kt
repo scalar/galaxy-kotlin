@@ -147,7 +147,7 @@ private constructor(
         System.err.println(
             buildString {
                 append("<-- !! ${error.javaClass.simpleName}")
-                error.message?.let { append(": $it") }
+                error.message?.let { append(": ${redactUrlCredentials(it)}") }
                 append(" (${took.format()})")
             }
         )
@@ -156,7 +156,9 @@ private constructor(
     private fun logHeaders(headers: Headers) =
         headers.names().forEach { name ->
             headers.values(name).forEach { value ->
-                System.err.println("$name: ${if (redactedHeaders.contains(name)) "██" else value}")
+                System.err.println(
+                    "$name: ${if (redactedHeaders.contains(name)) "██" else redactUrlCredentials(value)}"
+                )
             }
         }
 
@@ -523,7 +525,7 @@ private class LoggingBuffer(charset: Charset?) {
                 "(omitted line is not valid $charset)"
             }
         buffer.reset()
-        System.err.println(line)
+        System.err.println(redactUrlCredentials(line.toString()))
     }
 }
 
@@ -616,12 +618,98 @@ private fun Duration.format(): String =
         }
     }
 
-/** Query parameters whose values are masked in the logged request URL. */
+/**
+ * Query parameters a credential travels in, whose values the log masks wherever it prints a URL.
+ */
 private val REDACTED_QUERY_PARAMS: Set<String> = setOf("api_key")
 
-/** Returns the URL of [request] with the values of [REDACTED_QUERY_PARAMS] masked. */
+/** What a masked value is replaced with: plain text, because `url()` would percent-encode `██`. */
+private const val REDACTED_QUERY_VALUE = "REDACTED"
+
+/**
+ * Matches a [REDACTED_QUERY_PARAMS] name and its value in free text, capturing the separator, the
+ * name and the `=` ahead of the value it masks.
+ *
+ * A name counts after a separator, `?`, `&` or `;`, either literal or percent-encoded any number of
+ * times over (`%3F`, `%253F`), since a server can echo a whole URL encoded inside another
+ * parameter's value, as a redirect's `return_to` does; `;` also counts because an HTML-escaped
+ * message spells `&` as `&amp;`, and so does the `\u0026` a JSON encoder that escapes
+ * HTML-significant characters writes for `&` in a body. The `=` after it can be encoded the same
+ * way. The value then runs to the next literal `&`, `#` or whitespace: an encoded `%26` may end a
+ * nested value, but stopping there would leak the rest of a value a sloppy encoder left
+ * half-encoded, and masking too much is harmless. `<`, `>` and `"` end it too, since no valid URL
+ * carries them unencoded, so a `Link` header's `<url>` or a quoted URL keeps its closing delimiter.
+ * `'` does not: a query value can hold it raw. Every `25` run is possessive, so a hostile
+ * `%252525…` cannot make the match backtrack.
+ */
+private val REDACTED_QUERY_PATTERN: Regex =
+    Regex(
+        "((?:[?&;]|%(?:25)*+(?i:3f|26|3b)|\\\\u0026)(?:" +
+            REDACTED_QUERY_PARAMS.joinToString("|") { queryNamePattern(it) } +
+            ")(?:=|%(?:25)*+(?i:3d)))[^&#\\s<>\"]*"
+    )
+
+/**
+ * URL userinfo, `//user:token@`, which carries a credential as surely as the query does.
+ *
+ * The `//` may also be JSON-escaped as `\/\/`, which a JSON encoder that escapes slashes writes in
+ * a body; group 1 keeps whichever spelling matched, so the masked line reads as it was sent.
+ *
+ * The run stops at `"`, `<`, `>` and `\`, none of which userinfo can hold unencoded, as well as at
+ * whitespace and the URL's own delimiters. Body lines go through this too, and without those stops
+ * a compact JSON line such as `{"homepage":"https://example.com","email":"ops@example.com"}` would
+ * match from one field's `//` to the next field's `@` and mask everything in between. `'` and `,`
+ * do not stop it: both are legal in userinfo, so a password holding one would be left in the log
+ * whole, and the `"` already ends a JSON field before its `,`.
+ */
+private val URL_USERINFO_PATTERN: Regex = Regex("(//|\\\\/\\\\/)[^/?#@\\s\"<>\\\\]+@")
+
+/**
+ * A pattern matching [name] in every spelling a URL can carry it in: each character as written or
+ * as its UTF-8 bytes percent-encoded, at any depth and in either hex case (`k`, `%6B`, `%6b`,
+ * `%256B`), and a space also as `+`. Only the hex ignores case, not the name.
+ */
+private fun queryNamePattern(name: String): String = buildString {
+    var index = 0
+    while (index < name.length) {
+        val char = String(Character.toChars(name.codePointAt(index)))
+        index += char.length
+        append("(?:").append(Regex.escape(char)).append("|")
+        char.toByteArray(Charsets.UTF_8).forEach { byte ->
+            val hex = "%02x".format(byte.toInt() and 0xFF)
+            // A `%` is itself `25`, which the possessive run before the hex would swallow.
+            append(if (hex == "25") "%(?:25)++" else "%(?:25)*+(?i:$hex)")
+        }
+        if (char == " ") append("|\\+")
+        append(")")
+    }
+}
+
+/**
+ * Returns [text] with every credential query value and every URL userinfo in it masked.
+ *
+ * Runs over header values, body lines and error messages as well as the request URL, because a
+ * server can echo the URL it was sent back in a `Location` or `Link` header or a next-page link,
+ * nested and encoded inside another parameter's value.
+ */
+private fun redactUrlCredentials(text: String): String {
+    val withoutUserinfo =
+        URL_USERINFO_PATTERN.replace(text) { it.groupValues[1] + REDACTED_QUERY_VALUE + "@" }
+    return REDACTED_QUERY_PATTERN.replace(withoutUserinfo) {
+        it.groupValues[1] + REDACTED_QUERY_VALUE
+    }
+}
+
+/**
+ * Returns the URL of [request] with every credential in it masked, including one nested in another
+ * parameter's value.
+ */
 private fun loggableUrl(request: HttpRequest): String =
-    REDACTED_QUERY_PARAMS.filter { request.queryParams.values(it).isNotEmpty() }
-        .fold(request.toBuilder()) { builder, key -> builder.replaceQueryParams(key, "REDACTED") }
-        .build()
-        .url()
+    redactUrlCredentials(
+        REDACTED_QUERY_PARAMS.filter { request.queryParams.values(it).isNotEmpty() }
+            .fold(request.toBuilder()) { builder, key ->
+                builder.replaceQueryParams(key, REDACTED_QUERY_VALUE)
+            }
+            .build()
+            .url()
+    )

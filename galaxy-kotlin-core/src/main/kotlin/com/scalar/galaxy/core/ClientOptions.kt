@@ -8,6 +8,7 @@ import com.scalar.galaxy.core.http.HttpClient
 import com.scalar.galaxy.core.http.LoggingHttpClient
 import com.scalar.galaxy.core.http.PhantomReachableClosingHttpClient
 import com.scalar.galaxy.core.http.QueryParams
+import com.scalar.galaxy.core.http.RedirectingHttpClient
 import com.scalar.galaxy.core.http.RetryingHttpClient
 import java.time.Clock
 import java.time.Duration
@@ -20,7 +21,9 @@ private constructor(
     /**
      * The HTTP client to use in the SDK.
      *
-     * Use the one published in `galaxy-kotlin-client-okhttp` or implement your own.
+     * Use the one published in `galaxy-kotlin-client-okhttp` or implement your own. The SDK follows
+     * redirects itself, dropping credentials when one leaves the API's origin, so a client of your
+     * own must not follow redirects: one that does hands a redirect target every header.
      *
      * This class takes ownership of the client and closes it when closed.
      */
@@ -212,7 +215,10 @@ private constructor(
         /**
          * The HTTP client to use in the SDK.
          *
-         * Use the one published in `galaxy-kotlin-client-okhttp` or implement your own.
+         * Use the one published in `galaxy-kotlin-client-okhttp` or implement your own. The SDK
+         * follows redirects itself, dropping credentials when one leaves the API's origin, so a
+         * client of your own must not follow redirects: one that does hands a redirect target every
+         * header.
          *
          * This class takes ownership of the client and closes it when closed.
          */
@@ -522,33 +528,42 @@ private constructor(
             queryParams.replaceAll(this.queryParams.build())
             bearerAuth?.let {
                 if (!it.isEmpty()) {
-                    headers.replace("Authorization", "Bearer $it")
+                    headers.replace(
+                        "Authorization",
+                        "Bearer ${checkCredential("bearerAuth", it, true)}",
+                    )
                 }
             }
             apiKeyHeader?.let {
                 if (!it.isEmpty()) {
-                    headers.replace("X-API-Key", it)
+                    headers.replace("X-API-Key", checkCredential("apiKeyHeader", it, true))
                 }
             }
             apiKeyQuery?.let {
                 if (!it.isEmpty()) {
-                    queryParams.replace("api_key", it)
+                    queryParams.replace("api_key", checkCredential("apiKeyQuery", it, false))
                 }
             }
             oAuth2?.let {
                 if (!it.isEmpty()) {
-                    headers.replace("Authorization", "Bearer $it")
+                    headers.replace(
+                        "Authorization",
+                        "Bearer ${checkCredential("oAuth2", it, true)}",
+                    )
                 }
             }
             openIdConnect?.let {
                 if (!it.isEmpty()) {
-                    headers.replace("Authorization", "Bearer $it")
+                    headers.replace(
+                        "Authorization",
+                        "Bearer ${checkCredential("openIdConnect", it, true)}",
+                    )
                 }
             }
             val cookieParts = mutableListOf<String>()
             apiKeyCookie?.let {
                 if (!it.isEmpty()) {
-                    cookieParts.add("api_key=" + it)
+                    cookieParts.add("api_key=" + checkCredential("apiKeyCookie", it, true))
                 }
             }
             if (cookieParts.isNotEmpty()) {
@@ -567,17 +582,23 @@ private constructor(
 
             return ClientOptions(
                 httpClient,
-                RetryingHttpClient.builder()
+                // Redirects are followed outside the retry loop, so every hop gets the retries a
+                // request does, and a redirect the SDK refuses to follow is not retried.
+                RedirectingHttpClient.builder()
                     .httpClient(
-                        LoggingHttpClient.builder()
-                            .httpClient(httpClient)
+                        RetryingHttpClient.builder()
+                            .httpClient(
+                                LoggingHttpClient.builder()
+                                    .httpClient(httpClient)
+                                    .clock(clock)
+                                    .level(logLevel)
+                                    .build()
+                            )
+                            .sleeper(sleeper)
                             .clock(clock)
-                            .level(logLevel)
+                            .maxRetries(maxRetries)
                             .build()
                     )
-                    .sleeper(sleeper)
-                    .clock(clock)
-                    .maxRetries(maxRetries)
                     .build(),
                 checkJacksonVersionCompatibility,
                 jsonMapper,

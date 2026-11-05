@@ -48,6 +48,10 @@ mavenPublishing {
             connection.set("scm:git:https://github.com/scalar/galaxy-kotlin.git")
             developerConnection.set("scm:git:ssh://git@github.com/scalar/galaxy-kotlin.git")
         }
+        issueManagement {
+            system.set("GitHub")
+            url.set("https://github.com/scalar/galaxy-kotlin/issues")
+        }
     }
 }
 

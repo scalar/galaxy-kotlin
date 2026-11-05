@@ -16,22 +16,18 @@ import com.scalar.galaxy.errors.GalaxyInvalidDataException
 import java.util.Collections
 import java.util.Objects
 
-/**
- * A generic paginated resource. Specializing schemas bind the item type by declaring a
- * `$dynamicAnchor` named `itemType`, the JSON Schema 2020-12 way to express `PaginatedResource<T>`.
- */
 @com.fasterxml.jackson.annotation.JsonPropertyOrder("data", "meta")
 class PlanetListResponse
 @JsonCreator(mode = JsonCreator.Mode.DISABLED)
 private constructor(
-    private val data: JsonField<List<JsonValue>>,
+    private val data: JsonField<List<Planet>>,
     private val meta: JsonField<Meta>,
     private val additionalProperties: MutableMap<String, JsonValue>,
 ) {
 
     @JsonCreator
     private constructor(
-        @JsonProperty("data") @ExcludeMissing data: JsonField<List<JsonValue>> = JsonMissing.of(),
+        @JsonProperty("data") @ExcludeMissing data: JsonField<List<Planet>> = JsonMissing.of(),
         @JsonProperty("meta") @ExcludeMissing meta: JsonField<Meta> = JsonMissing.of(),
     ) : this(data, meta, mutableMapOf())
 
@@ -39,7 +35,7 @@ private constructor(
      * @throws GalaxyInvalidDataException if the JSON field has an unexpected type (e.g. if the
      *   server responded with an unexpected value).
      */
-    fun data(): List<JsonValue>? = data.getNullable("data")
+    fun data(): List<Planet>? = data.getNullable("data")
 
     /**
      * @throws GalaxyInvalidDataException if the JSON field has an unexpected type (e.g. if the
@@ -52,7 +48,7 @@ private constructor(
      *
      * Unlike [data], this method doesn't throw if the JSON field has an unexpected type.
      */
-    @JsonProperty("data") @ExcludeMissing fun _data(): JsonField<List<JsonValue>> = data
+    @JsonProperty("data") @ExcludeMissing fun _data(): JsonField<List<Planet>> = data
 
     /**
      * Returns the raw JSON value of [meta].
@@ -82,7 +78,7 @@ private constructor(
     /** A builder for [PlanetListResponse]. */
     class Builder internal constructor() {
 
-        private var data: JsonField<MutableList<JsonValue>>? = null
+        private var data: JsonField<MutableList<Planet>>? = null
         private var meta: JsonField<Meta> = JsonMissing.of()
         private var additionalProperties: MutableMap<String, JsonValue> = mutableMapOf()
 
@@ -92,25 +88,25 @@ private constructor(
             additionalProperties = planetListResponse.additionalProperties.toMutableMap()
         }
 
-        fun data(data: List<JsonValue>) = data(JsonField.of(data))
+        fun data(data: List<Planet>) = data(JsonField.of(data))
 
         /**
          * Sets [Builder.data] to an arbitrary JSON value.
          *
-         * You should usually call [Builder.data] with a well-typed `List<JsonValue>` value instead.
+         * You should usually call [Builder.data] with a well-typed `List<Planet>` value instead.
          * This method is primarily for setting the field to an undocumented or not yet supported
          * value.
          */
-        fun data(data: JsonField<List<JsonValue>>) = apply {
+        fun data(data: JsonField<List<Planet>>) = apply {
             this.data = data.map { it.toMutableList() }
         }
 
         /**
-         * Adds a single [JsonValue] to [Builder.data].
+         * Adds a single [Planet] to [Builder.data].
          *
          * @throws IllegalStateException if the field was previously set to a non-list.
          */
-        fun addData(data: JsonValue) = apply {
+        fun addData(data: Planet) = apply {
             this.data =
                 (this.data ?: JsonField.of(mutableListOf())).also {
                     checkKnown("data", it).add(data)
@@ -174,7 +170,7 @@ private constructor(
             return@apply
         }
 
-        data()
+        data()?.forEach { it.validate() }
         meta()?.validate()
         validated = true
     }
@@ -192,7 +188,8 @@ private constructor(
      *
      * Used for best match union deserialization.
      */
-    internal fun validity(): Int = (data.asKnown()?.size ?: 0) + (meta.asKnown()?.validity() ?: 0)
+    internal fun validity(): Int =
+        (data.asKnown()?.sumOf { it.validity().toInt() } ?: 0) + (meta.asKnown()?.validity() ?: 0)
 
     @com.fasterxml.jackson.annotation.JsonPropertyOrder("limit", "next", "offset", "total")
     class Meta
