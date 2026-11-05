@@ -38,19 +38,19 @@ It's easy to say you know them all, but do you really? Retrieve all the planets 
 
 | Direction | Type |
 | --- | --- |
-| Request | [`PlanetListAllDataParams`](./galaxy-kotlin-core/src/main/kotlin/com/scalar/galaxy/models/planets/PlanetListAllDataParams.kt) |
-| Response | [`PlanetListAllDataResponse`](./galaxy-kotlin-core/src/main/kotlin/com/scalar/galaxy/models/planets/PlanetListAllDataResponse.kt) |
+| Request | [`PlanetListParams`](./galaxy-kotlin-core/src/main/kotlin/com/scalar/galaxy/models/planets/PlanetListParams.kt) |
+| Response | [`PlanetListResponse`](./galaxy-kotlin-core/src/main/kotlin/com/scalar/galaxy/models/planets/PlanetListResponse.kt) |
 
 ```kotlin
 import com.scalar.galaxy.client.GalaxyClient
 import com.scalar.galaxy.client.okhttp.GalaxyOkHttpClient
-import com.scalar.galaxy.models.planets.PlanetListAllDataParams
+import com.scalar.galaxy.models.planets.PlanetListParams
 
 val client: GalaxyClient =
     GalaxyOkHttpClient.builder().bearerAuth(System.getenv("BEARER_AUTH")).build()
 
-val params = PlanetListAllDataParams.builder().limit(10L).offset(0L).build()
-val planet = client.planets().listAllData(params)
+val params = PlanetListParams.builder().limit(10L).offset(0L).build()
+val planet = client.planets().list(params)
 
 println(planet)
 ```
@@ -154,19 +154,19 @@ Got a crazy good photo of a planet? Share it with the world!
 
 | Direction | Type |
 | --- | --- |
-| Request | [`PlanetDelteImageParams`](./galaxy-kotlin-core/src/main/kotlin/com/scalar/galaxy/models/planets/PlanetDelteImageParams.kt) |
-| Response | [`PlanetDelteImageResponse`](./galaxy-kotlin-core/src/main/kotlin/com/scalar/galaxy/models/planets/PlanetDelteImageResponse.kt) |
+| Request | [`PlanetUploadImageParams`](./galaxy-kotlin-core/src/main/kotlin/com/scalar/galaxy/models/planets/PlanetUploadImageParams.kt) |
+| Response | [`PlanetUploadImageResponse`](./galaxy-kotlin-core/src/main/kotlin/com/scalar/galaxy/models/planets/PlanetUploadImageResponse.kt) |
 
 ```kotlin
 import com.scalar.galaxy.client.GalaxyClient
 import com.scalar.galaxy.client.okhttp.GalaxyOkHttpClient
-import com.scalar.galaxy.models.planets.PlanetDelteImageParams
+import com.scalar.galaxy.models.planets.PlanetUploadImageParams
 
 val client: GalaxyClient =
     GalaxyOkHttpClient.builder().bearerAuth(System.getenv("BEARER_AUTH")).build()
 
-val params = PlanetDelteImageParams.builder().planetId(1L).build()
-val planet = client.planets().delteImage(params)
+val params = PlanetUploadImageParams.builder().planetId(1L).build()
+val planet = client.planets().uploadImage(params)
 
 println(planet)
 ```

@@ -10,12 +10,12 @@ import com.scalar.galaxy.core.http.HttpResponseFor
 import com.scalar.galaxy.models.planets.Planet
 import com.scalar.galaxy.models.planets.PlanetCreateParams
 import com.scalar.galaxy.models.planets.PlanetDeleteParams
-import com.scalar.galaxy.models.planets.PlanetDelteImageParams
-import com.scalar.galaxy.models.planets.PlanetDelteImageResponse
-import com.scalar.galaxy.models.planets.PlanetListAllDataParams
-import com.scalar.galaxy.models.planets.PlanetListAllDataResponse
+import com.scalar.galaxy.models.planets.PlanetListParams
+import com.scalar.galaxy.models.planets.PlanetListResponse
 import com.scalar.galaxy.models.planets.PlanetRetrieveParams
 import com.scalar.galaxy.models.planets.PlanetUpdateParams
+import com.scalar.galaxy.models.planets.PlanetUploadImageParams
+import com.scalar.galaxy.models.planets.PlanetUploadImageResponse
 
 /** Everything about planets */
 interface PlanetServiceAsync {
@@ -81,6 +81,19 @@ interface PlanetServiceAsync {
     ): Planet
 
     /**
+     * It's easy to say you know them all, but do you really? Retrieve all the planets and check
+     * whether you missed one.
+     */
+    suspend fun list(
+        params: PlanetListParams = PlanetListParams.none(),
+        requestOptions: RequestOptions = RequestOptions.none(),
+    ): PlanetListResponse
+
+    /** @see list */
+    suspend fun list(requestOptions: RequestOptions): PlanetListResponse =
+        list(PlanetListParams.none(), requestOptions)
+
+    /**
      * This endpoint was used to delete planets. Unfortunately, that caused a lot of trouble for
      * planets with life. So, this endpoint is now deprecated and should not be used anymore.
      */
@@ -101,38 +114,25 @@ interface PlanetServiceAsync {
         delete(planetId, PlanetDeleteParams.none(), requestOptions)
 
     /** Got a crazy good photo of a planet? Share it with the world! */
-    suspend fun delteImage(
+    suspend fun uploadImage(
         planetId: Long,
-        params: PlanetDelteImageParams = PlanetDelteImageParams.none(),
+        params: PlanetUploadImageParams = PlanetUploadImageParams.none(),
         requestOptions: RequestOptions = RequestOptions.none(),
-    ): PlanetDelteImageResponse =
-        delteImage(params.toBuilder().planetId(planetId).build(), requestOptions)
+    ): PlanetUploadImageResponse =
+        uploadImage(params.toBuilder().planetId(planetId).build(), requestOptions)
 
-    /** @see delteImage */
-    suspend fun delteImage(
-        params: PlanetDelteImageParams,
+    /** @see uploadImage */
+    suspend fun uploadImage(
+        params: PlanetUploadImageParams,
         requestOptions: RequestOptions = RequestOptions.none(),
-    ): PlanetDelteImageResponse
+    ): PlanetUploadImageResponse
 
-    /** @see delteImage */
-    suspend fun delteImage(
+    /** @see uploadImage */
+    suspend fun uploadImage(
         planetId: Long,
         requestOptions: RequestOptions,
-    ): PlanetDelteImageResponse =
-        delteImage(planetId, PlanetDelteImageParams.none(), requestOptions)
-
-    /**
-     * It's easy to say you know them all, but do you really? Retrieve all the planets and check
-     * whether you missed one.
-     */
-    suspend fun listAllData(
-        params: PlanetListAllDataParams = PlanetListAllDataParams.none(),
-        requestOptions: RequestOptions = RequestOptions.none(),
-    ): PlanetListAllDataResponse
-
-    /** @see listAllData */
-    suspend fun listAllData(requestOptions: RequestOptions): PlanetListAllDataResponse =
-        listAllData(PlanetListAllDataParams.none(), requestOptions)
+    ): PlanetUploadImageResponse =
+        uploadImage(planetId, PlanetUploadImageParams.none(), requestOptions)
 
     /**
      * A view of [PlanetServiceAsync] that provides access to raw HTTP responses for each method.
@@ -212,6 +212,21 @@ interface PlanetServiceAsync {
         ): HttpResponseFor<Planet>
 
         /**
+         * Returns a raw HTTP response for `get /planets`, but is otherwise the same as
+         * [PlanetServiceAsync.list].
+         */
+        @MustBeClosed
+        suspend fun list(
+            params: PlanetListParams = PlanetListParams.none(),
+            requestOptions: RequestOptions = RequestOptions.none(),
+        ): HttpResponseFor<PlanetListResponse>
+
+        /** @see list */
+        @MustBeClosed
+        suspend fun list(requestOptions: RequestOptions): HttpResponseFor<PlanetListResponse> =
+            list(PlanetListParams.none(), requestOptions)
+
+        /**
          * Returns a raw HTTP response for `delete /planets/{planetId}`, but is otherwise the same
          * as [PlanetServiceAsync.delete].
          */
@@ -236,46 +251,29 @@ interface PlanetServiceAsync {
 
         /**
          * Returns a raw HTTP response for `post /planets/{planetId}/image`, but is otherwise the
-         * same as [PlanetServiceAsync.delteImage].
+         * same as [PlanetServiceAsync.uploadImage].
          */
         @MustBeClosed
-        suspend fun delteImage(
+        suspend fun uploadImage(
             planetId: Long,
-            params: PlanetDelteImageParams = PlanetDelteImageParams.none(),
+            params: PlanetUploadImageParams = PlanetUploadImageParams.none(),
             requestOptions: RequestOptions = RequestOptions.none(),
-        ): HttpResponseFor<PlanetDelteImageResponse> =
-            delteImage(params.toBuilder().planetId(planetId).build(), requestOptions)
+        ): HttpResponseFor<PlanetUploadImageResponse> =
+            uploadImage(params.toBuilder().planetId(planetId).build(), requestOptions)
 
-        /** @see delteImage */
+        /** @see uploadImage */
         @MustBeClosed
-        suspend fun delteImage(
-            params: PlanetDelteImageParams,
+        suspend fun uploadImage(
+            params: PlanetUploadImageParams,
             requestOptions: RequestOptions = RequestOptions.none(),
-        ): HttpResponseFor<PlanetDelteImageResponse>
+        ): HttpResponseFor<PlanetUploadImageResponse>
 
-        /** @see delteImage */
+        /** @see uploadImage */
         @MustBeClosed
-        suspend fun delteImage(
+        suspend fun uploadImage(
             planetId: Long,
             requestOptions: RequestOptions,
-        ): HttpResponseFor<PlanetDelteImageResponse> =
-            delteImage(planetId, PlanetDelteImageParams.none(), requestOptions)
-
-        /**
-         * Returns a raw HTTP response for `get /planets`, but is otherwise the same as
-         * [PlanetServiceAsync.listAllData].
-         */
-        @MustBeClosed
-        suspend fun listAllData(
-            params: PlanetListAllDataParams = PlanetListAllDataParams.none(),
-            requestOptions: RequestOptions = RequestOptions.none(),
-        ): HttpResponseFor<PlanetListAllDataResponse>
-
-        /** @see listAllData */
-        @MustBeClosed
-        suspend fun listAllData(
-            requestOptions: RequestOptions
-        ): HttpResponseFor<PlanetListAllDataResponse> =
-            listAllData(PlanetListAllDataParams.none(), requestOptions)
+        ): HttpResponseFor<PlanetUploadImageResponse> =
+            uploadImage(planetId, PlanetUploadImageParams.none(), requestOptions)
     }
 }
