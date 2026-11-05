@@ -4,6 +4,7 @@ package com.scalar.galaxy.services.async
 
 import com.scalar.galaxy.core.ClientOptions
 import com.scalar.galaxy.core.UnwrapWebhookParams
+import com.scalar.galaxy.core.http.Headers
 import com.scalar.galaxy.errors.GalaxyInvalidDataException
 import com.scalar.galaxy.errors.GalaxyWebhookException
 import com.scalar.galaxy.models.webhooks.UnwrapWebhookEvent
@@ -25,6 +26,8 @@ interface WebhookServiceAsync {
     /**
      * Unwraps a webhook event from its JSON representation.
      *
+     * It does not verify the event's signature.
+     *
      * @throws GalaxyInvalidDataException if the body could not be parsed.
      */
     fun unwrap(body: String): UnwrapWebhookEvent
@@ -32,13 +35,60 @@ interface WebhookServiceAsync {
     /**
      * Unwraps a webhook event from its JSON representation.
      *
-     * The signature is verified only when the params carry headers; an event replayed from storage
-     * carries none and is parsed as-is.
+     * The signature is verified whenever a secret is available, from the params or the client, and
+     * params without headers then fail verification. Only with no secret anywhere is an event
+     * without headers, one replayed from storage, parsed as-is.
      *
      * @throws GalaxyInvalidDataException if the body could not be parsed.
      * @throws GalaxyWebhookException if the webhook signature could not be verified
      */
     fun unwrap(unwrapParams: UnwrapWebhookParams): UnwrapWebhookEvent
+
+    /**
+     * Verifies the signature of a webhook event, then unwraps it from its JSON representation.
+     *
+     * A null `secret` falls back to the client's configured webhook key.
+     *
+     * @throws GalaxyInvalidDataException if the body could not be parsed or a signature header is
+     *   missing.
+     * @throws GalaxyWebhookException if the webhook signature could not be verified or the secret
+     *   is not valid
+     * @throws GalaxyException if no secret is set on the call or the client
+     */
+    suspend fun unwrap(body: String, headers: Headers, secret: String?): UnwrapWebhookEvent
+
+    /**
+     * Verifies that the payload was signed with the webhook key, throwing when it was not.
+     *
+     * Params without headers fail verification rather than being parsed unverified.
+     *
+     * @throws GalaxyInvalidDataException if a signature header is missing.
+     * @throws GalaxyWebhookException if the webhook signature could not be verified or the secret
+     *   is not valid
+     * @throws GalaxyException if no secret is set on the call or the client
+     */
+    suspend fun verifySignature(unwrapParams: UnwrapWebhookParams)
+
+    /**
+     * Verifies that the payload was signed with the webhook key, throwing when it was not.
+     *
+     * A null `secret` falls back to the client's configured webhook key.
+     *
+     * @throws GalaxyInvalidDataException if a signature header is missing.
+     * @throws GalaxyWebhookException if the webhook signature could not be verified or the secret
+     *   is not valid
+     * @throws GalaxyException if no secret is set on the call or the client
+     */
+    suspend fun verifySignature(payload: String, headers: Headers, secret: String?)
+
+    /**
+     * Parses the payload into a typed event without verifying its signature.
+     *
+     * Only use this for a payload whose signature was already verified, or in tests.
+     *
+     * @throws GalaxyInvalidDataException if the body could not be parsed.
+     */
+    suspend fun parseUnsafe(body: String): UnwrapWebhookEvent
 
     /**
      * A view of [WebhookServiceAsync] that provides access to raw HTTP responses for each method.
