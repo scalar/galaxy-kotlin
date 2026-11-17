@@ -42,7 +42,7 @@ internal class ProGuardCompatibilityTest {
     @Test
     fun keepRulesAreOnTheClasspath() {
         assertNotNull(
-            javaClass.classLoader.getResourceAsStream("META-INF/proguard/galaxy-kotlin-core.pro")
+            javaClass.classLoader.getResourceAsStream("META-INF/proguard/galaxy-kotlin-core.pro"),
         )
     }
 
@@ -68,8 +68,7 @@ internal class ProGuardCompatibilityTest {
 
     @Test
     fun credentialsRoundtrips() {
-        val credentials =
-            Credentials.builder().email("marc@scalar.com").password("i-love-scalar").build()
+        val credentials = Credentials.builder().email("marc@scalar.com").build()
         val credentialsJson = jsonMapper().writeValueAsString(credentials)
 
         assertEquals(
@@ -77,14 +76,17 @@ internal class ProGuardCompatibilityTest {
             jsonMapper()
                 .writeValueAsString(
                     jsonMapper()
-                        .readValue(credentialsJson, object : TypeReference<Credentials>() {})
+                        .readValue(credentialsJson, object : TypeReference<Credentials>() {}),
                 ),
         )
     }
 
     @Test
     fun celestialBodyRoundtrips() {
-        val celestialBody = CelestialBody.ofPlanet(Planet.builder().name("Mars").build())
+        val celestialBody =
+            CelestialBody.ofPlanet(
+                Planet.builder().id(1L).name("Mars").build(),
+            )
         val celestialBodyJson = jsonMapper().writeValueAsString(celestialBody)
 
         assertEquals(
@@ -92,7 +94,7 @@ internal class ProGuardCompatibilityTest {
             jsonMapper()
                 .writeValueAsString(
                     jsonMapper()
-                        .readValue(celestialBodyJson, object : TypeReference<CelestialBody>() {})
+                        .readValue(celestialBodyJson, object : TypeReference<CelestialBody>() {}),
                 ),
         )
     }

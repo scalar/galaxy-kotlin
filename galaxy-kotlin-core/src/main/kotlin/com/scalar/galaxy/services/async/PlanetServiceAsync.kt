@@ -41,12 +41,6 @@ interface PlanetServiceAsync {
         requestOptions: RequestOptions = RequestOptions.none(),
     ): Planet
 
-    /** @see create */
-    suspend fun create(
-        planet: Planet,
-        requestOptions: RequestOptions = RequestOptions.none(),
-    ): Planet = create(PlanetCreateParams.builder().planet(planet).build(), requestOptions)
-
     /**
      * You'll better learn a little bit more about the planets. It might come in handy once space
      * travel is available for everyone.
@@ -145,7 +139,7 @@ interface PlanetServiceAsync {
          * The original service is not modified.
          */
         fun withOptions(
-            modifier: (ClientOptions.Builder) -> Unit
+            modifier: (ClientOptions.Builder) -> Unit,
         ): PlanetServiceAsync.WithRawResponse
 
         /**
@@ -157,14 +151,6 @@ interface PlanetServiceAsync {
             params: PlanetCreateParams,
             requestOptions: RequestOptions = RequestOptions.none(),
         ): HttpResponseFor<Planet>
-
-        /** @see create */
-        @MustBeClosed
-        suspend fun create(
-            planet: Planet,
-            requestOptions: RequestOptions = RequestOptions.none(),
-        ): HttpResponseFor<Planet> =
-            create(PlanetCreateParams.builder().planet(planet).build(), requestOptions)
 
         /**
          * Returns a raw HTTP response for `get /planets/{planetId}`, but is otherwise the same as

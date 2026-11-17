@@ -95,7 +95,7 @@ private constructor(
                     val length = it.contentLength()
                     append(if (length >= 0) " ($length-byte body)" else " (unknown-length body)")
                 }
-            }
+            },
         )
 
         if (!level.shouldLog(LogLevel.DEBUG)) {
@@ -128,7 +128,7 @@ private constructor(
                     append(took.format())
                     contentLength?.let { append(", $contentLength-byte body") }
                 }
-            })"
+            })",
         )
 
         if (!level.shouldLog(LogLevel.DEBUG)) {
@@ -149,7 +149,7 @@ private constructor(
                 append("<-- !! ${error.javaClass.simpleName}")
                 error.message?.let { append(": ${redactUrlCredentials(it)}") }
                 append(" (${took.format()})")
-            }
+            },
         )
     }
 
@@ -157,7 +157,7 @@ private constructor(
         headers.names().forEach { name ->
             headers.values(name).forEach { value ->
                 System.err.println(
-                    "$name: ${if (redactedHeaders.contains(name)) "██" else redactUrlCredentials(value)}"
+                    "$name: ${if (redactedHeaders.contains(name)) "██" else redactUrlCredentials(value)}",
                 )
             }
         }
@@ -646,7 +646,7 @@ private val REDACTED_QUERY_PATTERN: Regex =
     Regex(
         "((?:[?&;]|%(?:25)*+(?i:3f|26|3b)|\\\\u0026)(?:" +
             REDACTED_QUERY_PARAMS.joinToString("|") { queryNamePattern(it) } +
-            ")(?:=|%(?:25)*+(?i:3d)))[^&#\\s<>\"]*"
+            ")(?:=|%(?:25)*+(?i:3d)))[^&#\\s<>\"]*",
     )
 
 /**
@@ -711,5 +711,5 @@ private fun loggableUrl(request: HttpRequest): String =
                 builder.replaceQueryParams(key, REDACTED_QUERY_VALUE)
             }
             .build()
-            .url()
+            .url(),
     )

@@ -67,13 +67,12 @@ Time to play god and create a new planet. What do you think? Ah, don't think too
 ```kotlin
 import com.scalar.galaxy.client.GalaxyClient
 import com.scalar.galaxy.client.okhttp.GalaxyOkHttpClient
-import com.scalar.galaxy.models.planets.Planet
 import com.scalar.galaxy.models.planets.PlanetCreateParams
 
 val client: GalaxyClient =
     GalaxyOkHttpClient.builder().bearerAuth(System.getenv("BEARER_AUTH")).build()
 
-val params = PlanetCreateParams.builder().planet(Planet.builder().name("Mars").build()).build()
+val params = PlanetCreateParams.builder().name("Mars").build()
 val planet = client.planets().create(params)
 
 println(planet)
@@ -114,14 +113,12 @@ Sometimes you make mistakes, that's fine. No worries, you can update all planets
 ```kotlin
 import com.scalar.galaxy.client.GalaxyClient
 import com.scalar.galaxy.client.okhttp.GalaxyOkHttpClient
-import com.scalar.galaxy.models.planets.Planet
 import com.scalar.galaxy.models.planets.PlanetUpdateParams
 
 val client: GalaxyClient =
     GalaxyOkHttpClient.builder().bearerAuth(System.getenv("BEARER_AUTH")).build()
 
-val params =
-    PlanetUpdateParams.builder().planetId(1L).planet(Planet.builder().name("Mars").build()).build()
+val params = PlanetUpdateParams.builder().planetId(1L).name("Mars").build()
 val planet = client.planets().update(params)
 
 println(planet)
@@ -187,16 +184,20 @@ Stars, moons, comets, the occasional rogue asteroid — if it glows or drifts th
 ```kotlin
 import com.scalar.galaxy.client.GalaxyClient
 import com.scalar.galaxy.client.okhttp.GalaxyOkHttpClient
-import com.scalar.galaxy.models.celestialBodies.CelestialBody
 import com.scalar.galaxy.models.celestialBodies.CelestialBodyCreateParams
-import com.scalar.galaxy.models.planets.Planet
+import com.scalar.galaxy.models.celestialBodies.CelestialBodyParam
+import com.scalar.galaxy.models.planets.PlanetParam
 
 val client: GalaxyClient =
     GalaxyOkHttpClient.builder().bearerAuth(System.getenv("BEARER_AUTH")).build()
 
 val params =
     CelestialBodyCreateParams.builder()
-        .celestialBody(CelestialBody.ofPlanet(Planet.builder().name("Mars").build()))
+        .celestialBody(
+            CelestialBodyParam.ofPlanet(
+                PlanetParam.builder().name("Mars").build(),
+            ),
+        )
         .build()
 val celestialBody = client.celestialBodies().create(params)
 
@@ -248,16 +249,14 @@ Yeah, this is the boring security stuff. Just get your super secret token and mo
 import com.scalar.galaxy.client.GalaxyClient
 import com.scalar.galaxy.client.okhttp.GalaxyOkHttpClient
 import com.scalar.galaxy.models.authentication.AuthenticationCreateTokenParams
-import com.scalar.galaxy.models.authentication.Credentials
 
 val client: GalaxyClient =
     GalaxyOkHttpClient.builder().bearerAuth(System.getenv("BEARER_AUTH")).build()
 
 val params =
     AuthenticationCreateTokenParams.builder()
-        .credentials(
-            Credentials.builder().email("marc@scalar.com").password("i-love-scalar").build()
-        )
+        .email("marc@scalar.com")
+        .password("i-love-scalar")
         .build()
 val authentication = client.authentication().createToken(params)
 
