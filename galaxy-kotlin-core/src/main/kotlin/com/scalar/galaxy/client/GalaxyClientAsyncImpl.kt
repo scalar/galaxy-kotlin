@@ -89,10 +89,10 @@ class GalaxyClientAsyncImpl(private val clientOptions: ClientOptions) : GalaxyCl
         }
 
         override fun withOptions(
-            modifier: (ClientOptions.Builder) -> Unit
+            modifier: (ClientOptions.Builder) -> Unit,
         ): GalaxyClientAsync.WithRawResponse =
             GalaxyClientAsyncImpl.WithRawResponseImpl(
-                clientOptions.toBuilder().apply(modifier).build()
+                clientOptions.toBuilder().apply(modifier).build(),
             )
 
         /** Everything about planets */

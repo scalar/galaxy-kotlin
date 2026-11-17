@@ -88,10 +88,10 @@ class PlanetServiceAsyncImpl internal constructor(private val clientOptions: Cli
             errorHandler(errorBodyHandler(clientOptions.jsonMapper))
 
         override fun withOptions(
-            modifier: (ClientOptions.Builder) -> Unit
+            modifier: (ClientOptions.Builder) -> Unit,
         ): PlanetServiceAsync.WithRawResponse =
             PlanetServiceAsyncImpl.WithRawResponseImpl(
-                clientOptions.toBuilder().apply(modifier).build()
+                clientOptions.toBuilder().apply(modifier).build(),
             )
 
         private val createHandler: Handler<Planet> = jsonHandler<Planet>(clientOptions.jsonMapper)

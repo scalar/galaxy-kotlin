@@ -79,7 +79,7 @@ class PlanetServiceImpl internal constructor(private val clientOptions: ClientOp
             errorHandler(errorBodyHandler(clientOptions.jsonMapper))
 
         override fun withOptions(
-            modifier: (ClientOptions.Builder) -> Unit
+            modifier: (ClientOptions.Builder) -> Unit,
         ): PlanetService.WithRawResponse =
             PlanetServiceImpl.WithRawResponseImpl(clientOptions.toBuilder().apply(modifier).build())
 

@@ -41,10 +41,6 @@ interface PlanetService {
         requestOptions: RequestOptions = RequestOptions.none(),
     ): Planet
 
-    /** @see create */
-    fun create(planet: Planet, requestOptions: RequestOptions = RequestOptions.none()): Planet =
-        create(PlanetCreateParams.builder().planet(planet).build(), requestOptions)
-
     /**
      * You'll better learn a little bit more about the planets. It might come in handy once space
      * travel is available for everyone.
@@ -145,14 +141,6 @@ interface PlanetService {
             params: PlanetCreateParams,
             requestOptions: RequestOptions = RequestOptions.none(),
         ): HttpResponseFor<Planet>
-
-        /** @see create */
-        @MustBeClosed
-        fun create(
-            planet: Planet,
-            requestOptions: RequestOptions = RequestOptions.none(),
-        ): HttpResponseFor<Planet> =
-            create(PlanetCreateParams.builder().planet(planet).build(), requestOptions)
 
         /**
          * Returns a raw HTTP response for `get /planets/{planetId}`, but is otherwise the same as

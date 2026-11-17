@@ -54,7 +54,7 @@ class WebhookServiceImpl internal constructor(private val clientOptions: ClientO
             }
         } else if (unwrapParams.secret() != null) {
             throw GalaxyWebhookException(
-                "Could not verify webhook event signature: a secret is set but the params carry no headers"
+                "Could not verify webhook event signature: a secret is set but the params carry no headers",
             )
         }
         return unwrap(unwrapParams.body())
@@ -72,7 +72,7 @@ class WebhookServiceImpl internal constructor(private val clientOptions: ClientO
             val webhookSecret =
                 unwrapParams.secret()
                     ?: throw GalaxyException(
-                        "The webhook secret must either be set on the client class, or passed to this method"
+                        "The webhook secret must either be set on the client class, or passed to this method",
                     )
 
             val headersMap =
@@ -98,7 +98,7 @@ class WebhookServiceImpl internal constructor(private val clientOptions: ClientO
             val webhookSecret =
                 unwrapParams.secret()
                     ?: throw GalaxyException(
-                        "The webhook secret must either be set on the client class, or passed to this method"
+                        "The webhook secret must either be set on the client class, or passed to this method",
                     )
 
             val headersMap = headers.names().associateWith { name -> headers.values(name) }.toMap()
@@ -114,7 +114,7 @@ class WebhookServiceImpl internal constructor(private val clientOptions: ClientO
 
     override fun verifySignature(payload: String, headers: Headers, secret: String?) =
         verifySignature(
-            UnwrapWebhookParams.builder().body(payload).headers(headers).secret(secret).build()
+            UnwrapWebhookParams.builder().body(payload).headers(headers).secret(secret).build(),
         )
 
     override fun parseUnsafe(body: String): UnwrapWebhookEvent = unwrap(body)
@@ -123,10 +123,10 @@ class WebhookServiceImpl internal constructor(private val clientOptions: ClientO
         WebhookService.WithRawResponse {
 
         override fun withOptions(
-            modifier: (ClientOptions.Builder) -> Unit
+            modifier: (ClientOptions.Builder) -> Unit,
         ): WebhookService.WithRawResponse =
             WebhookServiceImpl.WithRawResponseImpl(
-                clientOptions.toBuilder().apply(modifier).build()
+                clientOptions.toBuilder().apply(modifier).build(),
             )
     }
 }
