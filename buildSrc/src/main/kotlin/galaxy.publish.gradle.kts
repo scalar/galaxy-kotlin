@@ -10,7 +10,7 @@ dokka {
     dokkaGeneratorIsolation.set(
         ProcessIsolation {
             maxHeapSize.set("8g")
-        }
+        },
     )
 }
 
@@ -19,7 +19,7 @@ mavenPublishing {
         KotlinJvm(
             javadocJar = JavadocJar.Dokka("dokkaGeneratePublicationHtml"),
             sourcesJar = true,
-        )
+        ),
     )
     publishToMavenCentral(automaticRelease = true)
     signAllPublications()
@@ -27,7 +27,7 @@ mavenPublishing {
     pom {
         name.set("Scalar Galaxy SDK")
         description.set(
-            "The Scalar Galaxy is an example OpenAPI document to test OpenAPI tools and libraries. It's a fictional universe with fictional planets and fictional data."
+            "The Scalar Galaxy is an example OpenAPI document to test OpenAPI tools and libraries. It's a fictional universe with fictional planets and fictional data.",
         )
         url.set("https://github.com/scalar/galaxy-kotlin")
         licenses {
@@ -47,6 +47,10 @@ mavenPublishing {
             url.set("https://github.com/scalar/galaxy-kotlin")
             connection.set("scm:git:https://github.com/scalar/galaxy-kotlin.git")
             developerConnection.set("scm:git:ssh://git@github.com/scalar/galaxy-kotlin.git")
+        }
+        issueManagement {
+            system.set("GitHub")
+            url.set("https://github.com/scalar/galaxy-kotlin/issues")
         }
     }
 }

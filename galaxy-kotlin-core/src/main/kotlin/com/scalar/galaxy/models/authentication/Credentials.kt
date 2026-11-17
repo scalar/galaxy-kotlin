@@ -16,20 +16,18 @@ import java.util.Collections
 import java.util.Objects
 
 /** Credentials to authenticate a user */
-@com.fasterxml.jackson.annotation.JsonPropertyOrder("email", "password")
+@com.fasterxml.jackson.annotation.JsonPropertyOrder("email")
 class Credentials
 @JsonCreator(mode = JsonCreator.Mode.DISABLED)
 private constructor(
     private val email: JsonField<String>,
-    private val password: JsonField<String>,
     private val additionalProperties: MutableMap<String, JsonValue>,
 ) {
 
     @JsonCreator
     private constructor(
         @JsonProperty("email") @ExcludeMissing email: JsonField<String> = JsonMissing.of(),
-        @JsonProperty("password") @ExcludeMissing password: JsonField<String> = JsonMissing.of(),
-    ) : this(email, password, mutableMapOf())
+    ) : this(email, mutableMapOf())
 
     /**
      * @throws GalaxyInvalidDataException if the JSON field has an unexpected type or is
@@ -38,24 +36,11 @@ private constructor(
     fun email(): String = email.getRequired("email")
 
     /**
-     * @throws GalaxyInvalidDataException if the JSON field has an unexpected type or is
-     *   unexpectedly missing or null (e.g. if the server responded with an unexpected value).
-     */
-    fun password(): String = password.getRequired("password")
-
-    /**
      * Returns the raw JSON value of [email].
      *
      * Unlike [email], this method doesn't throw if the JSON field has an unexpected type.
      */
     @JsonProperty("email") @ExcludeMissing fun _email(): JsonField<String> = email
-
-    /**
-     * Returns the raw JSON value of [password].
-     *
-     * Unlike [password], this method doesn't throw if the JSON field has an unexpected type.
-     */
-    @JsonProperty("password") @ExcludeMissing fun _password(): JsonField<String> = password
 
     @JsonAnySetter
     private fun putAdditionalProperty(key: String, value: JsonValue) {
@@ -77,7 +62,6 @@ private constructor(
          * The following fields are required:
          * ```kotlin
          * .email()
-         * .password()
          * ```
          */
         fun builder() = Builder()
@@ -87,12 +71,10 @@ private constructor(
     class Builder internal constructor() {
 
         private var email: JsonField<String>? = null
-        private var password: JsonField<String>? = null
         private var additionalProperties: MutableMap<String, JsonValue> = mutableMapOf()
 
         internal fun from(credentials: Credentials) = apply {
             email = credentials.email
-            password = credentials.password
             additionalProperties = credentials.additionalProperties.toMutableMap()
         }
 
@@ -105,16 +87,6 @@ private constructor(
          * method is primarily for setting the field to an undocumented or not yet supported value.
          */
         fun email(email: JsonField<String>) = apply { this.email = email }
-
-        fun password(password: String) = password(JsonField.of(password))
-
-        /**
-         * Sets [Builder.password] to an arbitrary JSON value.
-         *
-         * You should usually call [Builder.password] with a well-typed [String] value instead. This
-         * method is primarily for setting the field to an undocumented or not yet supported value.
-         */
-        fun password(password: JsonField<String>) = apply { this.password = password }
 
         fun additionalProperties(additionalProperties: Map<String, JsonValue>) = apply {
             this.additionalProperties.clear()
@@ -143,17 +115,12 @@ private constructor(
          * The following fields are required:
          * ```kotlin
          * .email()
-         * .password()
          * ```
          *
          * @throws IllegalStateException if any required field is unset.
          */
         fun build(): Credentials =
-            Credentials(
-                checkRequired("email", email),
-                checkRequired("password", password),
-                additionalProperties.toMutableMap(),
-            )
+            Credentials(checkRequired("email", email), additionalProperties.toMutableMap())
     }
 
     private var validated: Boolean = false
@@ -172,7 +139,6 @@ private constructor(
         }
 
         email()
-        password()
         validated = true
     }
 
@@ -189,8 +155,7 @@ private constructor(
      *
      * Used for best match union deserialization.
      */
-    internal fun validity(): Int =
-        (if (email.asKnown() == null) 0 else 1) + (if (password.asKnown() == null) 0 else 1)
+    internal fun validity(): Int = (if (email.asKnown() == null) 0 else 1)
 
     override fun equals(other: Any?): Boolean {
         if (this === other) {
@@ -199,14 +164,13 @@ private constructor(
 
         return other is Credentials &&
             email == other.email &&
-            password == other.password &&
             additionalProperties == other.additionalProperties
     }
 
-    private val hashCode: Int by lazy { Objects.hash(email, password, additionalProperties) }
+    private val hashCode: Int by lazy { Objects.hash(email, additionalProperties) }
 
     override fun hashCode(): Int = hashCode
 
     override fun toString() =
-        "Credentials{email=$email, password=$password, additionalProperties=$additionalProperties}"
+        "Credentials{email=$email, additionalProperties=$additionalProperties}"
 }

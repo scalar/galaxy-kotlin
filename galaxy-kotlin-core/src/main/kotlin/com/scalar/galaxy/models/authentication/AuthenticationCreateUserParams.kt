@@ -42,12 +42,6 @@ private constructor(
      * @throws GalaxyInvalidDataException if the JSON field has an unexpected type (e.g. if the
      *   server responded with an unexpected value).
      */
-    fun id(): Long? = body.id()
-
-    /**
-     * @throws GalaxyInvalidDataException if the JSON field has an unexpected type (e.g. if the
-     *   server responded with an unexpected value).
-     */
     fun name(): String? = body.name()
 
     /**
@@ -63,13 +57,6 @@ private constructor(
      * Unlike [password], this method doesn't throw if the JSON field has an unexpected type.
      */
     fun _password(): JsonField<String> = body._password()
-
-    /**
-     * Returns the raw JSON value of [id].
-     *
-     * Unlike [id], this method doesn't throw if the JSON field has an unexpected type.
-     */
-    fun _id(): JsonField<Long> = body._id()
 
     /**
      * Returns the raw JSON value of [name].
@@ -123,7 +110,6 @@ private constructor(
          * Otherwise, it's more convenient to use the top-level setters instead:
          * - [email]
          * - [password]
-         * - [id]
          * - [name]
          */
         fun body(body: Body) = apply { this.body = body.toBuilder() }
@@ -147,16 +133,6 @@ private constructor(
          * method is primarily for setting the field to an undocumented or not yet supported value.
          */
         fun password(password: JsonField<String>) = apply { body.password(password) }
-
-        fun id(id: Long) = apply { body.id(id) }
-
-        /**
-         * Sets [Builder.id] to an arbitrary JSON value.
-         *
-         * You should usually call [Builder.id] with a well-typed [Long] value instead. This method
-         * is primarily for setting the field to an undocumented or not yet supported value.
-         */
-        fun id(id: JsonField<Long>) = apply { body.id(id) }
 
         fun name(name: String) = apply { body.name(name) }
 
@@ -312,13 +288,12 @@ private constructor(
 
     override fun _queryParams(): QueryParams = additionalQueryParams
 
-    @com.fasterxml.jackson.annotation.JsonPropertyOrder("email", "password", "id", "name")
+    @com.fasterxml.jackson.annotation.JsonPropertyOrder("email", "password", "name")
     class Body
     @JsonCreator(mode = JsonCreator.Mode.DISABLED)
     private constructor(
         private val email: JsonField<String>,
         private val password: JsonField<String>,
-        private val id: JsonField<Long>,
         private val name: JsonField<String>,
         private val additionalProperties: MutableMap<String, JsonValue>,
     ) {
@@ -329,9 +304,8 @@ private constructor(
             @JsonProperty("password")
             @ExcludeMissing
             password: JsonField<String> = JsonMissing.of(),
-            @JsonProperty("id") @ExcludeMissing id: JsonField<Long> = JsonMissing.of(),
             @JsonProperty("name") @ExcludeMissing name: JsonField<String> = JsonMissing.of(),
-        ) : this(email, password, id, name, mutableMapOf())
+        ) : this(email, password, name, mutableMapOf())
 
         /**
          * @throws GalaxyInvalidDataException if the JSON field has an unexpected type or is
@@ -344,12 +318,6 @@ private constructor(
          *   unexpectedly missing or null (e.g. if the server responded with an unexpected value).
          */
         fun password(): String = password.getRequired("password")
-
-        /**
-         * @throws GalaxyInvalidDataException if the JSON field has an unexpected type (e.g. if the
-         *   server responded with an unexpected value).
-         */
-        fun id(): Long? = id.getNullable("id")
 
         /**
          * @throws GalaxyInvalidDataException if the JSON field has an unexpected type (e.g. if the
@@ -370,13 +338,6 @@ private constructor(
          * Unlike [password], this method doesn't throw if the JSON field has an unexpected type.
          */
         @JsonProperty("password") @ExcludeMissing fun _password(): JsonField<String> = password
-
-        /**
-         * Returns the raw JSON value of [id].
-         *
-         * Unlike [id], this method doesn't throw if the JSON field has an unexpected type.
-         */
-        @JsonProperty("id") @ExcludeMissing fun _id(): JsonField<Long> = id
 
         /**
          * Returns the raw JSON value of [name].
@@ -416,14 +377,12 @@ private constructor(
 
             private var email: JsonField<String>? = null
             private var password: JsonField<String>? = null
-            private var id: JsonField<Long> = JsonMissing.of()
             private var name: JsonField<String> = JsonMissing.of()
             private var additionalProperties: MutableMap<String, JsonValue> = mutableMapOf()
 
             internal fun from(body: Body) = apply {
                 email = body.email
                 password = body.password
-                id = body.id
                 name = body.name
                 additionalProperties = body.additionalProperties.toMutableMap()
             }
@@ -449,17 +408,6 @@ private constructor(
              * supported value.
              */
             fun password(password: JsonField<String>) = apply { this.password = password }
-
-            fun id(id: Long) = id(JsonField.of(id))
-
-            /**
-             * Sets [Builder.id] to an arbitrary JSON value.
-             *
-             * You should usually call [Builder.id] with a well-typed [Long] value instead. This
-             * method is primarily for setting the field to an undocumented or not yet supported
-             * value.
-             */
-            fun id(id: JsonField<Long>) = apply { this.id = id }
 
             fun name(name: String) = name(JsonField.of(name))
 
@@ -508,7 +456,6 @@ private constructor(
                 Body(
                     checkRequired("email", email),
                     checkRequired("password", password),
-                    id,
                     name,
                     additionalProperties.toMutableMap(),
                 )
@@ -532,7 +479,6 @@ private constructor(
 
             email()
             password()
-            id()
             name()
             validated = true
         }
@@ -554,7 +500,6 @@ private constructor(
         internal fun validity(): Int =
             (if (email.asKnown() == null) 0 else 1) +
                 (if (password.asKnown() == null) 0 else 1) +
-                (if (id.asKnown() == null) 0 else 1) +
                 (if (name.asKnown() == null) 0 else 1)
 
         override fun equals(other: Any?): Boolean {
@@ -565,19 +510,18 @@ private constructor(
             return other is Body &&
                 email == other.email &&
                 password == other.password &&
-                id == other.id &&
                 name == other.name &&
                 additionalProperties == other.additionalProperties
         }
 
         private val hashCode: Int by lazy {
-            Objects.hash(email, password, id, name, additionalProperties)
+            Objects.hash(email, password, name, additionalProperties)
         }
 
         override fun hashCode(): Int = hashCode
 
         override fun toString() =
-            "Body{email=$email, password=$password, id=$id, name=$name, additionalProperties=$additionalProperties}"
+            "Body{email=$email, password=$password, name=$name, additionalProperties=$additionalProperties}"
     }
 
     override fun equals(other: Any?): Boolean {

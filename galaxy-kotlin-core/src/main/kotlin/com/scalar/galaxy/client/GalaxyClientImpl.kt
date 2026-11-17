@@ -85,7 +85,7 @@ class GalaxyClientImpl(private val clientOptions: ClientOptions) : GalaxyClient 
         }
 
         override fun withOptions(
-            modifier: (ClientOptions.Builder) -> Unit
+            modifier: (ClientOptions.Builder) -> Unit,
         ): GalaxyClient.WithRawResponse =
             GalaxyClientImpl.WithRawResponseImpl(clientOptions.toBuilder().apply(modifier).build())
 

@@ -2,28 +2,222 @@
 
 package com.scalar.galaxy.models.planets
 
+import com.fasterxml.jackson.annotation.JsonAnyGetter
+import com.fasterxml.jackson.annotation.JsonAnySetter
+import com.fasterxml.jackson.annotation.JsonCreator
+import com.fasterxml.jackson.annotation.JsonProperty
+import com.scalar.galaxy.core.Enum
+import com.scalar.galaxy.core.ExcludeMissing
+import com.scalar.galaxy.core.JsonField
+import com.scalar.galaxy.core.JsonMissing
 import com.scalar.galaxy.core.JsonValue
 import com.scalar.galaxy.core.Params
+import com.scalar.galaxy.core.checkKnown
 import com.scalar.galaxy.core.checkRequired
 import com.scalar.galaxy.core.http.Headers
 import com.scalar.galaxy.core.http.QueryParams
+import com.scalar.galaxy.core.toImmutable
+import com.scalar.galaxy.errors.GalaxyInvalidDataException
+import com.scalar.galaxy.models.authentication.UserParam
+import java.time.OffsetDateTime
+import java.util.Collections
 import java.util.Objects
 
 /** Sometimes you make mistakes, that's fine. No worries, you can update all planets. */
 class PlanetUpdateParams
 private constructor(
     private val planetId: Long?,
-    private val planet: Planet,
+    private val body: Body,
     private val additionalHeaders: Headers,
     private val additionalQueryParams: QueryParams,
 ) : Params {
 
+    /**
+     * @throws GalaxyInvalidDataException if the JSON field has an unexpected type or is
+     *   unexpectedly missing or null (e.g. if the server responded with an unexpected value).
+     */
+    fun name(): String = body.name()
+
+    /**
+     * Atmospheric composition
+     *
+     * @throws GalaxyInvalidDataException if the JSON field has an unexpected type (e.g. if the
+     *   server responded with an unexpected value).
+     */
+    fun atmosphere(): List<Atmosphere>? = body.atmosphere()
+
+    /**
+     * A user
+     *
+     * @throws GalaxyInvalidDataException if the JSON field has an unexpected type (e.g. if the
+     *   server responded with an unexpected value).
+     */
+    fun creator(): UserParam? = body.creator()
+
+    /**
+     * @throws GalaxyInvalidDataException if the JSON field has an unexpected type (e.g. if the
+     *   server responded with an unexpected value).
+     */
+    fun description(): String? = body.description()
+
+    /**
+     * @throws GalaxyInvalidDataException if the JSON field has an unexpected type (e.g. if the
+     *   server responded with an unexpected value).
+     */
+    fun discoveredAt(): OffsetDateTime? = body.discoveredAt()
+
+    /**
+     * URL which gets invoked upon a failed operation
+     *
+     * @throws GalaxyInvalidDataException if the JSON field has an unexpected type (e.g. if the
+     *   server responded with an unexpected value).
+     */
+    fun failureCallbackUrl(): String? = body.failureCallbackUrl()
+
+    /**
+     * A score from 0 to 1 indicating potential habitability
+     *
+     * @throws GalaxyInvalidDataException if the JSON field has an unexpected type (e.g. if the
+     *   server responded with an unexpected value).
+     */
+    fun habitabilityIndex(): Float? = body.habitabilityIndex()
+
+    /**
+     * @throws GalaxyInvalidDataException if the JSON field has an unexpected type (e.g. if the
+     *   server responded with an unexpected value).
+     */
+    fun image(): String? = body.image()
+
+    /**
+     * @throws GalaxyInvalidDataException if the JSON field has an unexpected type (e.g. if the
+     *   server responded with an unexpected value).
+     */
+    fun physicalProperties(): PhysicalProperties? = body.physicalProperties()
+
+    /**
+     * @throws GalaxyInvalidDataException if the JSON field has an unexpected type (e.g. if the
+     *   server responded with an unexpected value).
+     */
+    fun satellites(): List<JsonValue>? = body.satellites()
+
+    /**
+     * URL which gets invoked upon a successful operation
+     *
+     * @throws GalaxyInvalidDataException if the JSON field has an unexpected type (e.g. if the
+     *   server responded with an unexpected value).
+     */
+    fun successCallbackUrl(): String? = body.successCallbackUrl()
+
+    /**
+     * @throws GalaxyInvalidDataException if the JSON field has an unexpected type (e.g. if the
+     *   server responded with an unexpected value).
+     */
+    fun tags(): List<String>? = body.tags()
+
+    /**
+     * @throws GalaxyInvalidDataException if the JSON field has an unexpected type (e.g. if the
+     *   server responded with an unexpected value).
+     */
+    fun type(): Type? = body.type()
+
     fun planetId(): Long? = planetId
 
-    /** A planet in the Scalar Galaxy */
-    fun planet(): Planet = planet
+    /**
+     * Returns the raw JSON value of [name].
+     *
+     * Unlike [name], this method doesn't throw if the JSON field has an unexpected type.
+     */
+    fun _name(): JsonField<String> = body._name()
 
-    fun _additionalBodyProperties(): Map<String, JsonValue> = planet._additionalProperties()
+    /**
+     * Returns the raw JSON value of [atmosphere].
+     *
+     * Unlike [atmosphere], this method doesn't throw if the JSON field has an unexpected type.
+     */
+    fun _atmosphere(): JsonField<List<Atmosphere>> = body._atmosphere()
+
+    /**
+     * Returns the raw JSON value of [creator].
+     *
+     * Unlike [creator], this method doesn't throw if the JSON field has an unexpected type.
+     */
+    fun _creator(): JsonField<UserParam> = body._creator()
+
+    /**
+     * Returns the raw JSON value of [description].
+     *
+     * Unlike [description], this method doesn't throw if the JSON field has an unexpected type.
+     */
+    fun _description(): JsonField<String> = body._description()
+
+    /**
+     * Returns the raw JSON value of [discoveredAt].
+     *
+     * Unlike [discoveredAt], this method doesn't throw if the JSON field has an unexpected type.
+     */
+    fun _discoveredAt(): JsonField<OffsetDateTime> = body._discoveredAt()
+
+    /**
+     * Returns the raw JSON value of [failureCallbackUrl].
+     *
+     * Unlike [failureCallbackUrl], this method doesn't throw if the JSON field has an unexpected
+     * type.
+     */
+    fun _failureCallbackUrl(): JsonField<String> = body._failureCallbackUrl()
+
+    /**
+     * Returns the raw JSON value of [habitabilityIndex].
+     *
+     * Unlike [habitabilityIndex], this method doesn't throw if the JSON field has an unexpected
+     * type.
+     */
+    fun _habitabilityIndex(): JsonField<Float> = body._habitabilityIndex()
+
+    /**
+     * Returns the raw JSON value of [image].
+     *
+     * Unlike [image], this method doesn't throw if the JSON field has an unexpected type.
+     */
+    fun _image(): JsonField<String> = body._image()
+
+    /**
+     * Returns the raw JSON value of [physicalProperties].
+     *
+     * Unlike [physicalProperties], this method doesn't throw if the JSON field has an unexpected
+     * type.
+     */
+    fun _physicalProperties(): JsonField<PhysicalProperties> = body._physicalProperties()
+
+    /**
+     * Returns the raw JSON value of [satellites].
+     *
+     * Unlike [satellites], this method doesn't throw if the JSON field has an unexpected type.
+     */
+    fun _satellites(): JsonField<List<JsonValue>> = body._satellites()
+
+    /**
+     * Returns the raw JSON value of [successCallbackUrl].
+     *
+     * Unlike [successCallbackUrl], this method doesn't throw if the JSON field has an unexpected
+     * type.
+     */
+    fun _successCallbackUrl(): JsonField<String> = body._successCallbackUrl()
+
+    /**
+     * Returns the raw JSON value of [tags].
+     *
+     * Unlike [tags], this method doesn't throw if the JSON field has an unexpected type.
+     */
+    fun _tags(): JsonField<List<String>> = body._tags()
+
+    /**
+     * Returns the raw JSON value of [type].
+     *
+     * Unlike [type], this method doesn't throw if the JSON field has an unexpected type.
+     */
+    fun _type(): JsonField<Type> = body._type()
+
+    fun _additionalBodyProperties(): Map<String, JsonValue> = body._additionalProperties()
 
     /** Additional headers to send with the request. */
     fun _additionalHeaders(): Headers = additionalHeaders
@@ -40,7 +234,7 @@ private constructor(
          *
          * The following fields are required:
          * ```kotlin
-         * .planet()
+         * .name()
          * ```
          */
         fun builder() = Builder()
@@ -50,13 +244,13 @@ private constructor(
     class Builder internal constructor() {
 
         private var planetId: Long? = null
-        private var planet: Planet? = null
+        private var body: Body.Builder = Body.builder()
         private var additionalHeaders: Headers.Builder = Headers.builder()
         private var additionalQueryParams: QueryParams.Builder = QueryParams.builder()
 
         internal fun from(planetUpdateParams: PlanetUpdateParams) = apply {
             planetId = planetUpdateParams.planetId
-            planet = planetUpdateParams.planet
+            body = planetUpdateParams.body.toBuilder()
             additionalHeaders = planetUpdateParams.additionalHeaders.toBuilder()
             additionalQueryParams = planetUpdateParams.additionalQueryParams.toBuilder()
         }
@@ -70,8 +264,226 @@ private constructor(
          */
         fun planetId(planetId: Long) = planetId(planetId as Long?)
 
-        /** A planet in the Scalar Galaxy */
-        fun planet(planet: Planet) = apply { this.planet = planet }
+        /**
+         * Sets the entire request body.
+         *
+         * This is generally only useful if you are already constructing the body separately.
+         * Otherwise, it's more convenient to use the top-level setters instead:
+         * - [name]
+         * - [atmosphere]
+         * - [creator]
+         * - [description]
+         * - [discoveredAt]
+         * - etc.
+         */
+        fun body(body: Body) = apply { this.body = body.toBuilder() }
+
+        fun name(name: String) = apply { body.name(name) }
+
+        /**
+         * Sets [Builder.name] to an arbitrary JSON value.
+         *
+         * You should usually call [Builder.name] with a well-typed [String] value instead. This
+         * method is primarily for setting the field to an undocumented or not yet supported value.
+         */
+        fun name(name: JsonField<String>) = apply { body.name(name) }
+
+        /** Atmospheric composition */
+        fun atmosphere(atmosphere: List<Atmosphere>) = apply { body.atmosphere(atmosphere) }
+
+        /**
+         * Sets [Builder.atmosphere] to an arbitrary JSON value.
+         *
+         * You should usually call [Builder.atmosphere] with a well-typed `List<Atmosphere>` value
+         * instead. This method is primarily for setting the field to an undocumented or not yet
+         * supported value.
+         */
+        fun atmosphere(atmosphere: JsonField<List<Atmosphere>>) = apply {
+            body.atmosphere(atmosphere)
+        }
+
+        /**
+         * Adds a single [Atmosphere] to [Builder.atmosphere].
+         *
+         * @throws IllegalStateException if the field was previously set to a non-list.
+         */
+        fun addAtmosphere(atmosphere: Atmosphere) = apply { body.addAtmosphere(atmosphere) }
+
+        /** A user */
+        fun creator(creator: UserParam) = apply { body.creator(creator) }
+
+        /**
+         * Sets [Builder.creator] to an arbitrary JSON value.
+         *
+         * You should usually call [Builder.creator] with a well-typed [UserParam] value instead.
+         * This method is primarily for setting the field to an undocumented or not yet supported
+         * value.
+         */
+        fun creator(creator: JsonField<UserParam>) = apply { body.creator(creator) }
+
+        fun description(description: String?) = apply { body.description(description) }
+
+        /**
+         * Sets [Builder.description] to an arbitrary JSON value.
+         *
+         * You should usually call [Builder.description] with a well-typed [String] value instead.
+         * This method is primarily for setting the field to an undocumented or not yet supported
+         * value.
+         */
+        fun description(description: JsonField<String>) = apply { body.description(description) }
+
+        fun discoveredAt(discoveredAt: OffsetDateTime) = apply { body.discoveredAt(discoveredAt) }
+
+        /**
+         * Sets [Builder.discoveredAt] to an arbitrary JSON value.
+         *
+         * You should usually call [Builder.discoveredAt] with a well-typed [OffsetDateTime] value
+         * instead. This method is primarily for setting the field to an undocumented or not yet
+         * supported value.
+         */
+        fun discoveredAt(discoveredAt: JsonField<OffsetDateTime>) = apply {
+            body.discoveredAt(discoveredAt)
+        }
+
+        /** URL which gets invoked upon a failed operation */
+        fun failureCallbackUrl(failureCallbackUrl: String) = apply {
+            body.failureCallbackUrl(failureCallbackUrl)
+        }
+
+        /**
+         * Sets [Builder.failureCallbackUrl] to an arbitrary JSON value.
+         *
+         * You should usually call [Builder.failureCallbackUrl] with a well-typed [String] value
+         * instead. This method is primarily for setting the field to an undocumented or not yet
+         * supported value.
+         */
+        fun failureCallbackUrl(failureCallbackUrl: JsonField<String>) = apply {
+            body.failureCallbackUrl(failureCallbackUrl)
+        }
+
+        /** A score from 0 to 1 indicating potential habitability */
+        fun habitabilityIndex(habitabilityIndex: Float) = apply {
+            body.habitabilityIndex(habitabilityIndex)
+        }
+
+        /**
+         * Sets [Builder.habitabilityIndex] to an arbitrary JSON value.
+         *
+         * You should usually call [Builder.habitabilityIndex] with a well-typed [Float] value
+         * instead. This method is primarily for setting the field to an undocumented or not yet
+         * supported value.
+         */
+        fun habitabilityIndex(habitabilityIndex: JsonField<Float>) = apply {
+            body.habitabilityIndex(habitabilityIndex)
+        }
+
+        fun image(image: String?) = apply { body.image(image) }
+
+        /**
+         * Sets [Builder.image] to an arbitrary JSON value.
+         *
+         * You should usually call [Builder.image] with a well-typed [String] value instead. This
+         * method is primarily for setting the field to an undocumented or not yet supported value.
+         */
+        fun image(image: JsonField<String>) = apply { body.image(image) }
+
+        fun physicalProperties(physicalProperties: PhysicalProperties) = apply {
+            body.physicalProperties(physicalProperties)
+        }
+
+        /**
+         * Sets [Builder.physicalProperties] to an arbitrary JSON value.
+         *
+         * You should usually call [Builder.physicalProperties] with a well-typed
+         * [PhysicalProperties] value instead. This method is primarily for setting the field to an
+         * undocumented or not yet supported value.
+         */
+        fun physicalProperties(physicalProperties: JsonField<PhysicalProperties>) = apply {
+            body.physicalProperties(physicalProperties)
+        }
+
+        fun satellites(satellites: List<JsonValue>) = apply { body.satellites(satellites) }
+
+        /**
+         * Sets [Builder.satellites] to an arbitrary JSON value.
+         *
+         * You should usually call [Builder.satellites] with a well-typed `List<JsonValue>` value
+         * instead. This method is primarily for setting the field to an undocumented or not yet
+         * supported value.
+         */
+        fun satellites(satellites: JsonField<List<JsonValue>>) = apply {
+            body.satellites(satellites)
+        }
+
+        /**
+         * Adds a single [JsonValue] to [satellites].
+         *
+         * @throws IllegalStateException if the field was previously set to a non-list.
+         */
+        fun addSatellite(satellite: JsonValue) = apply { body.addSatellite(satellite) }
+
+        /** URL which gets invoked upon a successful operation */
+        fun successCallbackUrl(successCallbackUrl: String) = apply {
+            body.successCallbackUrl(successCallbackUrl)
+        }
+
+        /**
+         * Sets [Builder.successCallbackUrl] to an arbitrary JSON value.
+         *
+         * You should usually call [Builder.successCallbackUrl] with a well-typed [String] value
+         * instead. This method is primarily for setting the field to an undocumented or not yet
+         * supported value.
+         */
+        fun successCallbackUrl(successCallbackUrl: JsonField<String>) = apply {
+            body.successCallbackUrl(successCallbackUrl)
+        }
+
+        fun tags(tags: List<String>) = apply { body.tags(tags) }
+
+        /**
+         * Sets [Builder.tags] to an arbitrary JSON value.
+         *
+         * You should usually call [Builder.tags] with a well-typed `List<String>` value instead.
+         * This method is primarily for setting the field to an undocumented or not yet supported
+         * value.
+         */
+        fun tags(tags: JsonField<List<String>>) = apply { body.tags(tags) }
+
+        /**
+         * Adds a single [String] to [tags].
+         *
+         * @throws IllegalStateException if the field was previously set to a non-list.
+         */
+        fun addTag(tag: String) = apply { body.addTag(tag) }
+
+        fun type(type: Type) = apply { body.type(type) }
+
+        /**
+         * Sets [Builder.type] to an arbitrary JSON value.
+         *
+         * You should usually call [Builder.type] with a well-typed [Type] value instead. This
+         * method is primarily for setting the field to an undocumented or not yet supported value.
+         */
+        fun type(type: JsonField<Type>) = apply { body.type(type) }
+
+        fun additionalBodyProperties(additionalBodyProperties: Map<String, JsonValue>) = apply {
+            body.additionalProperties(additionalBodyProperties)
+        }
+
+        fun putAdditionalBodyProperty(key: String, value: JsonValue) = apply {
+            body.putAdditionalProperty(key, value)
+        }
+
+        fun putAllAdditionalBodyProperties(additionalBodyProperties: Map<String, JsonValue>) =
+            apply {
+                body.putAllAdditionalProperties(additionalBodyProperties)
+            }
+
+        fun removeAdditionalBodyProperty(key: String) = apply { body.removeAdditionalProperty(key) }
+
+        fun removeAllAdditionalBodyProperties(keys: Set<String>) = apply {
+            body.removeAllAdditionalProperties(keys)
+        }
 
         fun additionalHeaders(additionalHeaders: Headers) = apply {
             this.additionalHeaders.clear()
@@ -178,7 +590,7 @@ private constructor(
          *
          * The following fields are required:
          * ```kotlin
-         * .planet()
+         * .name()
          * ```
          *
          * @throws IllegalStateException if any required field is unset.
@@ -186,13 +598,13 @@ private constructor(
         fun build(): PlanetUpdateParams =
             PlanetUpdateParams(
                 planetId,
-                checkRequired("planet", planet),
+                body.build(),
                 additionalHeaders.build(),
                 additionalQueryParams.build(),
             )
     }
 
-    fun _body(): Planet = planet
+    fun _body(): Body = body
 
     fun _pathParam(index: Int): String =
         when (index) {
@@ -204,6 +616,1546 @@ private constructor(
 
     override fun _queryParams(): QueryParams = additionalQueryParams
 
+    @com.fasterxml.jackson.annotation.JsonPropertyOrder(
+        "name",
+        "atmosphere",
+        "creator",
+        "description",
+        "discoveredAt",
+        "failureCallbackUrl",
+        "habitabilityIndex",
+        "image",
+        "physicalProperties",
+        "satellites",
+        "successCallbackUrl",
+        "tags",
+        "type",
+    )
+    class Body
+    @JsonCreator(mode = JsonCreator.Mode.DISABLED)
+    private constructor(
+        private val name: JsonField<String>,
+        private val atmosphere: JsonField<List<Atmosphere>>,
+        private val creator: JsonField<UserParam>,
+        private val description: JsonField<String>,
+        private val discoveredAt: JsonField<OffsetDateTime>,
+        private val failureCallbackUrl: JsonField<String>,
+        private val habitabilityIndex: JsonField<Float>,
+        private val image: JsonField<String>,
+        private val physicalProperties: JsonField<PhysicalProperties>,
+        private val satellites: JsonField<List<JsonValue>>,
+        private val successCallbackUrl: JsonField<String>,
+        private val tags: JsonField<List<String>>,
+        private val type: JsonField<Type>,
+        private val additionalProperties: MutableMap<String, JsonValue>,
+    ) {
+
+        @JsonCreator
+        private constructor(
+            @JsonProperty("name") @ExcludeMissing name: JsonField<String> = JsonMissing.of(),
+            @JsonProperty("atmosphere")
+            @ExcludeMissing
+            atmosphere: JsonField<List<Atmosphere>> = JsonMissing.of(),
+            @JsonProperty("creator")
+            @ExcludeMissing
+            creator: JsonField<UserParam> = JsonMissing.of(),
+            @JsonProperty("description")
+            @ExcludeMissing
+            description: JsonField<String> = JsonMissing.of(),
+            @JsonProperty("discoveredAt")
+            @ExcludeMissing
+            discoveredAt: JsonField<OffsetDateTime> = JsonMissing.of(),
+            @JsonProperty("failureCallbackUrl")
+            @ExcludeMissing
+            failureCallbackUrl: JsonField<String> = JsonMissing.of(),
+            @JsonProperty("habitabilityIndex")
+            @ExcludeMissing
+            habitabilityIndex: JsonField<Float> = JsonMissing.of(),
+            @JsonProperty("image") @ExcludeMissing image: JsonField<String> = JsonMissing.of(),
+            @JsonProperty("physicalProperties")
+            @ExcludeMissing
+            physicalProperties: JsonField<PhysicalProperties> = JsonMissing.of(),
+            @JsonProperty("satellites")
+            @ExcludeMissing
+            satellites: JsonField<List<JsonValue>> = JsonMissing.of(),
+            @JsonProperty("successCallbackUrl")
+            @ExcludeMissing
+            successCallbackUrl: JsonField<String> = JsonMissing.of(),
+            @JsonProperty("tags") @ExcludeMissing tags: JsonField<List<String>> = JsonMissing.of(),
+            @JsonProperty("type") @ExcludeMissing type: JsonField<Type> = JsonMissing.of(),
+        ) : this(
+            name,
+            atmosphere,
+            creator,
+            description,
+            discoveredAt,
+            failureCallbackUrl,
+            habitabilityIndex,
+            image,
+            physicalProperties,
+            satellites,
+            successCallbackUrl,
+            tags,
+            type,
+            mutableMapOf(),
+        )
+
+        /**
+         * @throws GalaxyInvalidDataException if the JSON field has an unexpected type or is
+         *   unexpectedly missing or null (e.g. if the server responded with an unexpected value).
+         */
+        fun name(): String = name.getRequired("name")
+
+        /**
+         * Atmospheric composition
+         *
+         * @throws GalaxyInvalidDataException if the JSON field has an unexpected type (e.g. if the
+         *   server responded with an unexpected value).
+         */
+        fun atmosphere(): List<Atmosphere>? = atmosphere.getNullable("atmosphere")
+
+        /**
+         * A user
+         *
+         * @throws GalaxyInvalidDataException if the JSON field has an unexpected type (e.g. if the
+         *   server responded with an unexpected value).
+         */
+        fun creator(): UserParam? = creator.getNullable("creator")
+
+        /**
+         * @throws GalaxyInvalidDataException if the JSON field has an unexpected type (e.g. if the
+         *   server responded with an unexpected value).
+         */
+        fun description(): String? = description.getNullable("description")
+
+        /**
+         * @throws GalaxyInvalidDataException if the JSON field has an unexpected type (e.g. if the
+         *   server responded with an unexpected value).
+         */
+        fun discoveredAt(): OffsetDateTime? = discoveredAt.getNullable("discoveredAt")
+
+        /**
+         * URL which gets invoked upon a failed operation
+         *
+         * @throws GalaxyInvalidDataException if the JSON field has an unexpected type (e.g. if the
+         *   server responded with an unexpected value).
+         */
+        fun failureCallbackUrl(): String? = failureCallbackUrl.getNullable("failureCallbackUrl")
+
+        /**
+         * A score from 0 to 1 indicating potential habitability
+         *
+         * @throws GalaxyInvalidDataException if the JSON field has an unexpected type (e.g. if the
+         *   server responded with an unexpected value).
+         */
+        fun habitabilityIndex(): Float? = habitabilityIndex.getNullable("habitabilityIndex")
+
+        /**
+         * @throws GalaxyInvalidDataException if the JSON field has an unexpected type (e.g. if the
+         *   server responded with an unexpected value).
+         */
+        fun image(): String? = image.getNullable("image")
+
+        /**
+         * @throws GalaxyInvalidDataException if the JSON field has an unexpected type (e.g. if the
+         *   server responded with an unexpected value).
+         */
+        fun physicalProperties(): PhysicalProperties? =
+            physicalProperties.getNullable("physicalProperties")
+
+        /**
+         * @throws GalaxyInvalidDataException if the JSON field has an unexpected type (e.g. if the
+         *   server responded with an unexpected value).
+         */
+        fun satellites(): List<JsonValue>? = satellites.getNullable("satellites")
+
+        /**
+         * URL which gets invoked upon a successful operation
+         *
+         * @throws GalaxyInvalidDataException if the JSON field has an unexpected type (e.g. if the
+         *   server responded with an unexpected value).
+         */
+        fun successCallbackUrl(): String? = successCallbackUrl.getNullable("successCallbackUrl")
+
+        /**
+         * @throws GalaxyInvalidDataException if the JSON field has an unexpected type (e.g. if the
+         *   server responded with an unexpected value).
+         */
+        fun tags(): List<String>? = tags.getNullable("tags")
+
+        /**
+         * @throws GalaxyInvalidDataException if the JSON field has an unexpected type (e.g. if the
+         *   server responded with an unexpected value).
+         */
+        fun type(): Type? = type.getNullable("type")
+
+        /**
+         * Returns the raw JSON value of [name].
+         *
+         * Unlike [name], this method doesn't throw if the JSON field has an unexpected type.
+         */
+        @JsonProperty("name") @ExcludeMissing fun _name(): JsonField<String> = name
+
+        /**
+         * Returns the raw JSON value of [atmosphere].
+         *
+         * Unlike [atmosphere], this method doesn't throw if the JSON field has an unexpected type.
+         */
+        @JsonProperty("atmosphere")
+        @ExcludeMissing
+        fun _atmosphere(): JsonField<List<Atmosphere>> = atmosphere
+
+        /**
+         * Returns the raw JSON value of [creator].
+         *
+         * Unlike [creator], this method doesn't throw if the JSON field has an unexpected type.
+         */
+        @JsonProperty("creator") @ExcludeMissing fun _creator(): JsonField<UserParam> = creator
+
+        /**
+         * Returns the raw JSON value of [description].
+         *
+         * Unlike [description], this method doesn't throw if the JSON field has an unexpected type.
+         */
+        @JsonProperty("description")
+        @ExcludeMissing
+        fun _description(): JsonField<String> = description
+
+        /**
+         * Returns the raw JSON value of [discoveredAt].
+         *
+         * Unlike [discoveredAt], this method doesn't throw if the JSON field has an unexpected
+         * type.
+         */
+        @JsonProperty("discoveredAt")
+        @ExcludeMissing
+        fun _discoveredAt(): JsonField<OffsetDateTime> = discoveredAt
+
+        /**
+         * Returns the raw JSON value of [failureCallbackUrl].
+         *
+         * Unlike [failureCallbackUrl], this method doesn't throw if the JSON field has an
+         * unexpected type.
+         */
+        @JsonProperty("failureCallbackUrl")
+        @ExcludeMissing
+        fun _failureCallbackUrl(): JsonField<String> = failureCallbackUrl
+
+        /**
+         * Returns the raw JSON value of [habitabilityIndex].
+         *
+         * Unlike [habitabilityIndex], this method doesn't throw if the JSON field has an unexpected
+         * type.
+         */
+        @JsonProperty("habitabilityIndex")
+        @ExcludeMissing
+        fun _habitabilityIndex(): JsonField<Float> = habitabilityIndex
+
+        /**
+         * Returns the raw JSON value of [image].
+         *
+         * Unlike [image], this method doesn't throw if the JSON field has an unexpected type.
+         */
+        @JsonProperty("image") @ExcludeMissing fun _image(): JsonField<String> = image
+
+        /**
+         * Returns the raw JSON value of [physicalProperties].
+         *
+         * Unlike [physicalProperties], this method doesn't throw if the JSON field has an
+         * unexpected type.
+         */
+        @JsonProperty("physicalProperties")
+        @ExcludeMissing
+        fun _physicalProperties(): JsonField<PhysicalProperties> = physicalProperties
+
+        /**
+         * Returns the raw JSON value of [satellites].
+         *
+         * Unlike [satellites], this method doesn't throw if the JSON field has an unexpected type.
+         */
+        @JsonProperty("satellites")
+        @ExcludeMissing
+        fun _satellites(): JsonField<List<JsonValue>> = satellites
+
+        /**
+         * Returns the raw JSON value of [successCallbackUrl].
+         *
+         * Unlike [successCallbackUrl], this method doesn't throw if the JSON field has an
+         * unexpected type.
+         */
+        @JsonProperty("successCallbackUrl")
+        @ExcludeMissing
+        fun _successCallbackUrl(): JsonField<String> = successCallbackUrl
+
+        /**
+         * Returns the raw JSON value of [tags].
+         *
+         * Unlike [tags], this method doesn't throw if the JSON field has an unexpected type.
+         */
+        @JsonProperty("tags") @ExcludeMissing fun _tags(): JsonField<List<String>> = tags
+
+        /**
+         * Returns the raw JSON value of [type].
+         *
+         * Unlike [type], this method doesn't throw if the JSON field has an unexpected type.
+         */
+        @JsonProperty("type") @ExcludeMissing fun _type(): JsonField<Type> = type
+
+        @JsonAnySetter
+        private fun putAdditionalProperty(key: String, value: JsonValue) {
+            additionalProperties.put(key, value)
+        }
+
+        @JsonAnyGetter
+        @ExcludeMissing
+        fun _additionalProperties(): Map<String, JsonValue> =
+            Collections.unmodifiableMap(additionalProperties)
+
+        fun toBuilder() = Builder().from(this)
+
+        companion object {
+
+            /**
+             * Returns a mutable builder for constructing an instance of [Body].
+             *
+             * The following fields are required:
+             * ```kotlin
+             * .name()
+             * ```
+             */
+            fun builder() = Builder()
+        }
+
+        /** A builder for [Body]. */
+        class Builder internal constructor() {
+
+            private var name: JsonField<String>? = null
+            private var atmosphere: JsonField<MutableList<Atmosphere>>? = null
+            private var creator: JsonField<UserParam> = JsonMissing.of()
+            private var description: JsonField<String> = JsonMissing.of()
+            private var discoveredAt: JsonField<OffsetDateTime> = JsonMissing.of()
+            private var failureCallbackUrl: JsonField<String> = JsonMissing.of()
+            private var habitabilityIndex: JsonField<Float> = JsonMissing.of()
+            private var image: JsonField<String> = JsonMissing.of()
+            private var physicalProperties: JsonField<PhysicalProperties> = JsonMissing.of()
+            private var satellites: JsonField<MutableList<JsonValue>>? = null
+            private var successCallbackUrl: JsonField<String> = JsonMissing.of()
+            private var tags: JsonField<MutableList<String>>? = null
+            private var type: JsonField<Type> = JsonMissing.of()
+            private var additionalProperties: MutableMap<String, JsonValue> = mutableMapOf()
+
+            internal fun from(body: Body) = apply {
+                name = body.name
+                atmosphere = body.atmosphere.map { it.toMutableList() }
+                creator = body.creator
+                description = body.description
+                discoveredAt = body.discoveredAt
+                failureCallbackUrl = body.failureCallbackUrl
+                habitabilityIndex = body.habitabilityIndex
+                image = body.image
+                physicalProperties = body.physicalProperties
+                satellites = body.satellites.map { it.toMutableList() }
+                successCallbackUrl = body.successCallbackUrl
+                tags = body.tags.map { it.toMutableList() }
+                type = body.type
+                additionalProperties = body.additionalProperties.toMutableMap()
+            }
+
+            fun name(name: String) = name(JsonField.of(name))
+
+            /**
+             * Sets [Builder.name] to an arbitrary JSON value.
+             *
+             * You should usually call [Builder.name] with a well-typed [String] value instead. This
+             * method is primarily for setting the field to an undocumented or not yet supported
+             * value.
+             */
+            fun name(name: JsonField<String>) = apply { this.name = name }
+
+            /** Atmospheric composition */
+            fun atmosphere(atmosphere: List<Atmosphere>) = atmosphere(JsonField.of(atmosphere))
+
+            /**
+             * Sets [Builder.atmosphere] to an arbitrary JSON value.
+             *
+             * You should usually call [Builder.atmosphere] with a well-typed `List<Atmosphere>`
+             * value instead. This method is primarily for setting the field to an undocumented or
+             * not yet supported value.
+             */
+            fun atmosphere(atmosphere: JsonField<List<Atmosphere>>) = apply {
+                this.atmosphere = atmosphere.map { it.toMutableList() }
+            }
+
+            /**
+             * Adds a single [Atmosphere] to [Builder.atmosphere].
+             *
+             * @throws IllegalStateException if the field was previously set to a non-list.
+             */
+            fun addAtmosphere(atmosphere: Atmosphere) = apply {
+                this.atmosphere =
+                    (this.atmosphere ?: JsonField.of(mutableListOf())).also {
+                        checkKnown("atmosphere", it).add(atmosphere)
+                    }
+            }
+
+            /** A user */
+            fun creator(creator: UserParam) = creator(JsonField.of(creator))
+
+            /**
+             * Sets [Builder.creator] to an arbitrary JSON value.
+             *
+             * You should usually call [Builder.creator] with a well-typed [UserParam] value
+             * instead. This method is primarily for setting the field to an undocumented or not yet
+             * supported value.
+             */
+            fun creator(creator: JsonField<UserParam>) = apply { this.creator = creator }
+
+            fun description(description: String?) = description(JsonField.ofNullable(description))
+
+            /**
+             * Sets [Builder.description] to an arbitrary JSON value.
+             *
+             * You should usually call [Builder.description] with a well-typed [String] value
+             * instead. This method is primarily for setting the field to an undocumented or not yet
+             * supported value.
+             */
+            fun description(description: JsonField<String>) = apply {
+                this.description = description
+            }
+
+            fun discoveredAt(discoveredAt: OffsetDateTime) =
+                discoveredAt(JsonField.of(discoveredAt))
+
+            /**
+             * Sets [Builder.discoveredAt] to an arbitrary JSON value.
+             *
+             * You should usually call [Builder.discoveredAt] with a well-typed [OffsetDateTime]
+             * value instead. This method is primarily for setting the field to an undocumented or
+             * not yet supported value.
+             */
+            fun discoveredAt(discoveredAt: JsonField<OffsetDateTime>) = apply {
+                this.discoveredAt = discoveredAt
+            }
+
+            /** URL which gets invoked upon a failed operation */
+            fun failureCallbackUrl(failureCallbackUrl: String) =
+                failureCallbackUrl(JsonField.of(failureCallbackUrl))
+
+            /**
+             * Sets [Builder.failureCallbackUrl] to an arbitrary JSON value.
+             *
+             * You should usually call [Builder.failureCallbackUrl] with a well-typed [String] value
+             * instead. This method is primarily for setting the field to an undocumented or not yet
+             * supported value.
+             */
+            fun failureCallbackUrl(failureCallbackUrl: JsonField<String>) = apply {
+                this.failureCallbackUrl = failureCallbackUrl
+            }
+
+            /** A score from 0 to 1 indicating potential habitability */
+            fun habitabilityIndex(habitabilityIndex: Float) =
+                habitabilityIndex(JsonField.of(habitabilityIndex))
+
+            /**
+             * Sets [Builder.habitabilityIndex] to an arbitrary JSON value.
+             *
+             * You should usually call [Builder.habitabilityIndex] with a well-typed [Float] value
+             * instead. This method is primarily for setting the field to an undocumented or not yet
+             * supported value.
+             */
+            fun habitabilityIndex(habitabilityIndex: JsonField<Float>) = apply {
+                this.habitabilityIndex = habitabilityIndex
+            }
+
+            fun image(image: String?) = image(JsonField.ofNullable(image))
+
+            /**
+             * Sets [Builder.image] to an arbitrary JSON value.
+             *
+             * You should usually call [Builder.image] with a well-typed [String] value instead.
+             * This method is primarily for setting the field to an undocumented or not yet
+             * supported value.
+             */
+            fun image(image: JsonField<String>) = apply { this.image = image }
+
+            fun physicalProperties(physicalProperties: PhysicalProperties) =
+                physicalProperties(JsonField.of(physicalProperties))
+
+            /**
+             * Sets [Builder.physicalProperties] to an arbitrary JSON value.
+             *
+             * You should usually call [Builder.physicalProperties] with a well-typed
+             * [PhysicalProperties] value instead. This method is primarily for setting the field to
+             * an undocumented or not yet supported value.
+             */
+            fun physicalProperties(physicalProperties: JsonField<PhysicalProperties>) = apply {
+                this.physicalProperties = physicalProperties
+            }
+
+            fun satellites(satellites: List<JsonValue>) = satellites(JsonField.of(satellites))
+
+            /**
+             * Sets [Builder.satellites] to an arbitrary JSON value.
+             *
+             * You should usually call [Builder.satellites] with a well-typed `List<JsonValue>`
+             * value instead. This method is primarily for setting the field to an undocumented or
+             * not yet supported value.
+             */
+            fun satellites(satellites: JsonField<List<JsonValue>>) = apply {
+                this.satellites = satellites.map { it.toMutableList() }
+            }
+
+            /**
+             * Adds a single [JsonValue] to [satellites].
+             *
+             * @throws IllegalStateException if the field was previously set to a non-list.
+             */
+            fun addSatellite(satellite: JsonValue) = apply {
+                satellites =
+                    (satellites ?: JsonField.of(mutableListOf())).also {
+                        checkKnown("satellites", it).add(satellite)
+                    }
+            }
+
+            /** URL which gets invoked upon a successful operation */
+            fun successCallbackUrl(successCallbackUrl: String) =
+                successCallbackUrl(JsonField.of(successCallbackUrl))
+
+            /**
+             * Sets [Builder.successCallbackUrl] to an arbitrary JSON value.
+             *
+             * You should usually call [Builder.successCallbackUrl] with a well-typed [String] value
+             * instead. This method is primarily for setting the field to an undocumented or not yet
+             * supported value.
+             */
+            fun successCallbackUrl(successCallbackUrl: JsonField<String>) = apply {
+                this.successCallbackUrl = successCallbackUrl
+            }
+
+            fun tags(tags: List<String>) = tags(JsonField.of(tags))
+
+            /**
+             * Sets [Builder.tags] to an arbitrary JSON value.
+             *
+             * You should usually call [Builder.tags] with a well-typed `List<String>` value
+             * instead. This method is primarily for setting the field to an undocumented or not yet
+             * supported value.
+             */
+            fun tags(tags: JsonField<List<String>>) = apply {
+                this.tags = tags.map { it.toMutableList() }
+            }
+
+            /**
+             * Adds a single [String] to [tags].
+             *
+             * @throws IllegalStateException if the field was previously set to a non-list.
+             */
+            fun addTag(tag: String) = apply {
+                tags =
+                    (tags ?: JsonField.of(mutableListOf())).also { checkKnown("tags", it).add(tag) }
+            }
+
+            fun type(type: Type) = type(JsonField.of(type))
+
+            /**
+             * Sets [Builder.type] to an arbitrary JSON value.
+             *
+             * You should usually call [Builder.type] with a well-typed [Type] value instead. This
+             * method is primarily for setting the field to an undocumented or not yet supported
+             * value.
+             */
+            fun type(type: JsonField<Type>) = apply { this.type = type }
+
+            fun additionalProperties(additionalProperties: Map<String, JsonValue>) = apply {
+                this.additionalProperties.clear()
+                putAllAdditionalProperties(additionalProperties)
+            }
+
+            fun putAdditionalProperty(key: String, value: JsonValue) = apply {
+                additionalProperties.put(key, value)
+            }
+
+            fun putAllAdditionalProperties(additionalProperties: Map<String, JsonValue>) = apply {
+                this.additionalProperties.putAll(additionalProperties)
+            }
+
+            fun removeAdditionalProperty(key: String) = apply { additionalProperties.remove(key) }
+
+            fun removeAllAdditionalProperties(keys: Set<String>) = apply {
+                keys.forEach(::removeAdditionalProperty)
+            }
+
+            /**
+             * Returns an immutable instance of [Body].
+             *
+             * Further updates to this [Builder] will not mutate the returned instance.
+             *
+             * The following fields are required:
+             * ```kotlin
+             * .name()
+             * ```
+             *
+             * @throws IllegalStateException if any required field is unset.
+             */
+            fun build(): Body =
+                Body(
+                    checkRequired("name", name),
+                    (atmosphere ?: JsonMissing.of()).map { it.toImmutable() },
+                    creator,
+                    description,
+                    discoveredAt,
+                    failureCallbackUrl,
+                    habitabilityIndex,
+                    image,
+                    physicalProperties,
+                    (satellites ?: JsonMissing.of()).map { it.toImmutable() },
+                    successCallbackUrl,
+                    (tags ?: JsonMissing.of()).map { it.toImmutable() },
+                    type,
+                    additionalProperties.toMutableMap(),
+                )
+        }
+
+        private var validated: Boolean = false
+
+        /**
+         * Validates that the types of all values in this object match their expected types
+         * recursively.
+         *
+         * This method is _not_ forwards compatible with new types from the API for existing fields.
+         *
+         * @throws GalaxyInvalidDataException if any value type in this object doesn't match its
+         *   expected type.
+         */
+        fun validate(): Body = apply {
+            if (validated) {
+                return@apply
+            }
+
+            name()
+            atmosphere()?.forEach { it.validate() }
+            creator()?.validate()
+            description()
+            discoveredAt()
+            failureCallbackUrl()
+            habitabilityIndex()
+            image()
+            physicalProperties()?.validate()
+            satellites()
+            successCallbackUrl()
+            tags()
+            type()?.validate()
+            validated = true
+        }
+
+        fun isValid(): Boolean =
+            try {
+                validate()
+                true
+            } catch (e: GalaxyInvalidDataException) {
+                false
+            }
+
+        /**
+         * Returns a score indicating how many valid values are contained in this object
+         * recursively.
+         *
+         * Used for best match union deserialization.
+         */
+        internal fun validity(): Int =
+            (if (name.asKnown() == null) 0 else 1) +
+                (atmosphere.asKnown()?.sumOf { it.validity().toInt() } ?: 0) +
+                (creator.asKnown()?.validity() ?: 0) +
+                (if (description.asKnown() == null) 0 else 1) +
+                (if (discoveredAt.asKnown() == null) 0 else 1) +
+                (if (failureCallbackUrl.asKnown() == null) 0 else 1) +
+                (if (habitabilityIndex.asKnown() == null) 0 else 1) +
+                (if (image.asKnown() == null) 0 else 1) +
+                (physicalProperties.asKnown()?.validity() ?: 0) +
+                (satellites.asKnown()?.size ?: 0) +
+                (if (successCallbackUrl.asKnown() == null) 0 else 1) +
+                (tags.asKnown()?.size ?: 0) +
+                (type.asKnown()?.validity() ?: 0)
+
+        override fun equals(other: Any?): Boolean {
+            if (this === other) {
+                return true
+            }
+
+            return other is Body &&
+                name == other.name &&
+                atmosphere == other.atmosphere &&
+                creator == other.creator &&
+                description == other.description &&
+                discoveredAt == other.discoveredAt &&
+                failureCallbackUrl == other.failureCallbackUrl &&
+                habitabilityIndex == other.habitabilityIndex &&
+                image == other.image &&
+                physicalProperties == other.physicalProperties &&
+                satellites == other.satellites &&
+                successCallbackUrl == other.successCallbackUrl &&
+                tags == other.tags &&
+                type == other.type &&
+                additionalProperties == other.additionalProperties
+        }
+
+        private val hashCode: Int by lazy {
+            Objects.hash(
+                name,
+                atmosphere,
+                creator,
+                description,
+                discoveredAt,
+                failureCallbackUrl,
+                habitabilityIndex,
+                image,
+                physicalProperties,
+                satellites,
+                successCallbackUrl,
+                tags,
+                type,
+                additionalProperties,
+            )
+        }
+
+        override fun hashCode(): Int = hashCode
+
+        override fun toString() =
+            "Body{name=$name, atmosphere=$atmosphere, creator=$creator, description=$description, discoveredAt=$discoveredAt, failureCallbackUrl=$failureCallbackUrl, habitabilityIndex=$habitabilityIndex, image=$image, physicalProperties=$physicalProperties, satellites=$satellites, successCallbackUrl=$successCallbackUrl, tags=$tags, type=$type, additionalProperties=$additionalProperties}"
+    }
+
+    class Type @JsonCreator private constructor(private val value: JsonField<String>) : Enum {
+
+        /**
+         * Returns this class instance's raw value.
+         *
+         * This is usually only useful if this instance was deserialized from data that doesn't
+         * match any known member, and you want to know that value. For example, if the SDK is on an
+         * older version than the API, then the API may respond with new members that the SDK is
+         * unaware of.
+         */
+        @com.fasterxml.jackson.annotation.JsonValue fun _value(): JsonField<String> = value
+
+        companion object {
+
+            val TERRESTRIAL = of("terrestrial")
+
+            val GAS_GIANT = of("gas_giant")
+
+            val ICE_GIANT = of("ice_giant")
+
+            val DWARF = of("dwarf")
+
+            val SUPER_EARTH = of("super_earth")
+
+            fun of(value: String) = Type(JsonField.of(value))
+        }
+
+        /** An enum containing [Type]'s known values. */
+        enum class Known {
+            TERRESTRIAL,
+            GAS_GIANT,
+            ICE_GIANT,
+            DWARF,
+            SUPER_EARTH,
+        }
+
+        /**
+         * An enum containing [Type]'s known values, as well as an [_UNKNOWN] member.
+         *
+         * An instance of [Type] can contain an unknown value in a couple of cases:
+         * - It was deserialized from data that doesn't match any known member. For example, if the
+         *   SDK is on an older version than the API, then the API may respond with new members that
+         *   the SDK is unaware of.
+         * - It was constructed with an arbitrary value using the [of] method.
+         */
+        enum class Value {
+            TERRESTRIAL,
+            GAS_GIANT,
+            ICE_GIANT,
+            DWARF,
+            SUPER_EARTH,
+            /** An enum member indicating that [Type] was instantiated with an unknown value. */
+            _UNKNOWN,
+        }
+
+        /**
+         * Returns an enum member corresponding to this class instance's value, or [Value._UNKNOWN]
+         * if the class was instantiated with an unknown value.
+         *
+         * Use the [known] method instead if you're certain the value is always known or if you want
+         * to throw for the unknown case.
+         */
+        fun value(): Value =
+            when (this) {
+                TERRESTRIAL -> Value.TERRESTRIAL
+                GAS_GIANT -> Value.GAS_GIANT
+                ICE_GIANT -> Value.ICE_GIANT
+                DWARF -> Value.DWARF
+                SUPER_EARTH -> Value.SUPER_EARTH
+                else -> Value._UNKNOWN
+            }
+
+        /**
+         * Returns an enum member corresponding to this class instance's value.
+         *
+         * Use the [value] method instead if you're uncertain the value is always known and don't
+         * want to throw for the unknown case.
+         *
+         * @throws GalaxyInvalidDataException if this class instance's value is a not a known
+         *   member.
+         */
+        fun known(): Known =
+            when (this) {
+                TERRESTRIAL -> Known.TERRESTRIAL
+                GAS_GIANT -> Known.GAS_GIANT
+                ICE_GIANT -> Known.ICE_GIANT
+                DWARF -> Known.DWARF
+                SUPER_EARTH -> Known.SUPER_EARTH
+                else -> throw GalaxyInvalidDataException("Unknown Type: $value")
+            }
+
+        /**
+         * Returns this class instance's primitive wire representation.
+         *
+         * This differs from the [toString] method because that method is primarily for debugging
+         * and generally doesn't throw.
+         *
+         * @throws GalaxyInvalidDataException if this class instance's value does not have the
+         *   expected primitive type.
+         */
+        fun asString(): String =
+            _value().asString() ?: throw GalaxyInvalidDataException("Value is not a String")
+
+        private var validated: Boolean = false
+
+        /**
+         * Validates that the types of all values in this object match their expected types
+         * recursively.
+         *
+         * This method is _not_ forwards compatible with new types from the API for existing fields.
+         *
+         * @throws GalaxyInvalidDataException if any value type in this object doesn't match its
+         *   expected type.
+         */
+        fun validate(): Type = apply {
+            if (validated) {
+                return@apply
+            }
+
+            known()
+            validated = true
+        }
+
+        fun isValid(): Boolean =
+            try {
+                validate()
+                true
+            } catch (e: GalaxyInvalidDataException) {
+                false
+            }
+
+        /**
+         * Returns a score indicating how many valid values are contained in this object
+         * recursively.
+         *
+         * Used for best match union deserialization.
+         */
+        internal fun validity(): Int = if (value() == Value._UNKNOWN) 0 else 1
+
+        override fun equals(other: Any?): Boolean {
+            if (this === other) {
+                return true
+            }
+
+            return other is Type && value == other.value
+        }
+
+        override fun hashCode() = value.hashCode()
+
+        override fun toString() = value.toString()
+    }
+
+    @com.fasterxml.jackson.annotation.JsonPropertyOrder("gravity", "mass", "radius", "temperature")
+    class PhysicalProperties
+    @JsonCreator(mode = JsonCreator.Mode.DISABLED)
+    private constructor(
+        private val gravity: JsonField<Float>,
+        private val mass: JsonField<Float>,
+        private val radius: JsonField<Float>,
+        private val temperature: JsonField<Temperature>,
+        private val additionalProperties: MutableMap<String, JsonValue>,
+    ) {
+
+        @JsonCreator
+        private constructor(
+            @JsonProperty("gravity") @ExcludeMissing gravity: JsonField<Float> = JsonMissing.of(),
+            @JsonProperty("mass") @ExcludeMissing mass: JsonField<Float> = JsonMissing.of(),
+            @JsonProperty("radius") @ExcludeMissing radius: JsonField<Float> = JsonMissing.of(),
+            @JsonProperty("temperature")
+            @ExcludeMissing
+            temperature: JsonField<Temperature> = JsonMissing.of(),
+        ) : this(gravity, mass, radius, temperature, mutableMapOf())
+
+        /**
+         * Surface gravity in Earth g
+         *
+         * @throws GalaxyInvalidDataException if the JSON field has an unexpected type (e.g. if the
+         *   server responded with an unexpected value).
+         */
+        fun gravity(): Float? = gravity.getNullable("gravity")
+
+        /**
+         * Mass in Earth masses (must be greater than 0)
+         *
+         * @throws GalaxyInvalidDataException if the JSON field has an unexpected type (e.g. if the
+         *   server responded with an unexpected value).
+         */
+        fun mass(): Float? = mass.getNullable("mass")
+
+        /**
+         * Radius in Earth radii (must be greater than 0)
+         *
+         * @throws GalaxyInvalidDataException if the JSON field has an unexpected type (e.g. if the
+         *   server responded with an unexpected value).
+         */
+        fun radius(): Float? = radius.getNullable("radius")
+
+        /**
+         * @throws GalaxyInvalidDataException if the JSON field has an unexpected type (e.g. if the
+         *   server responded with an unexpected value).
+         */
+        fun temperature(): Temperature? = temperature.getNullable("temperature")
+
+        /**
+         * Returns the raw JSON value of [gravity].
+         *
+         * Unlike [gravity], this method doesn't throw if the JSON field has an unexpected type.
+         */
+        @JsonProperty("gravity") @ExcludeMissing fun _gravity(): JsonField<Float> = gravity
+
+        /**
+         * Returns the raw JSON value of [mass].
+         *
+         * Unlike [mass], this method doesn't throw if the JSON field has an unexpected type.
+         */
+        @JsonProperty("mass") @ExcludeMissing fun _mass(): JsonField<Float> = mass
+
+        /**
+         * Returns the raw JSON value of [radius].
+         *
+         * Unlike [radius], this method doesn't throw if the JSON field has an unexpected type.
+         */
+        @JsonProperty("radius") @ExcludeMissing fun _radius(): JsonField<Float> = radius
+
+        /**
+         * Returns the raw JSON value of [temperature].
+         *
+         * Unlike [temperature], this method doesn't throw if the JSON field has an unexpected type.
+         */
+        @JsonProperty("temperature")
+        @ExcludeMissing
+        fun _temperature(): JsonField<Temperature> = temperature
+
+        @JsonAnySetter
+        private fun putAdditionalProperty(key: String, value: JsonValue) {
+            additionalProperties.put(key, value)
+        }
+
+        @JsonAnyGetter
+        @ExcludeMissing
+        fun _additionalProperties(): Map<String, JsonValue> =
+            Collections.unmodifiableMap(additionalProperties)
+
+        fun toBuilder() = Builder().from(this)
+
+        companion object {
+
+            /** Returns a mutable builder for constructing an instance of [PhysicalProperties]. */
+            fun builder() = Builder()
+        }
+
+        /** A builder for [PhysicalProperties]. */
+        class Builder internal constructor() {
+
+            private var gravity: JsonField<Float> = JsonMissing.of()
+            private var mass: JsonField<Float> = JsonMissing.of()
+            private var radius: JsonField<Float> = JsonMissing.of()
+            private var temperature: JsonField<Temperature> = JsonMissing.of()
+            private var additionalProperties: MutableMap<String, JsonValue> = mutableMapOf()
+
+            internal fun from(physicalProperties: PhysicalProperties) = apply {
+                gravity = physicalProperties.gravity
+                mass = physicalProperties.mass
+                radius = physicalProperties.radius
+                temperature = physicalProperties.temperature
+                additionalProperties = physicalProperties.additionalProperties.toMutableMap()
+            }
+
+            /** Surface gravity in Earth g */
+            fun gravity(gravity: Float) = gravity(JsonField.of(gravity))
+
+            /**
+             * Sets [Builder.gravity] to an arbitrary JSON value.
+             *
+             * You should usually call [Builder.gravity] with a well-typed [Float] value instead.
+             * This method is primarily for setting the field to an undocumented or not yet
+             * supported value.
+             */
+            fun gravity(gravity: JsonField<Float>) = apply { this.gravity = gravity }
+
+            /** Mass in Earth masses (must be greater than 0) */
+            fun mass(mass: Float) = mass(JsonField.of(mass))
+
+            /**
+             * Sets [Builder.mass] to an arbitrary JSON value.
+             *
+             * You should usually call [Builder.mass] with a well-typed [Float] value instead. This
+             * method is primarily for setting the field to an undocumented or not yet supported
+             * value.
+             */
+            fun mass(mass: JsonField<Float>) = apply { this.mass = mass }
+
+            /** Radius in Earth radii (must be greater than 0) */
+            fun radius(radius: Float) = radius(JsonField.of(radius))
+
+            /**
+             * Sets [Builder.radius] to an arbitrary JSON value.
+             *
+             * You should usually call [Builder.radius] with a well-typed [Float] value instead.
+             * This method is primarily for setting the field to an undocumented or not yet
+             * supported value.
+             */
+            fun radius(radius: JsonField<Float>) = apply { this.radius = radius }
+
+            fun temperature(temperature: Temperature) = temperature(JsonField.of(temperature))
+
+            /**
+             * Sets [Builder.temperature] to an arbitrary JSON value.
+             *
+             * You should usually call [Builder.temperature] with a well-typed [Temperature] value
+             * instead. This method is primarily for setting the field to an undocumented or not yet
+             * supported value.
+             */
+            fun temperature(temperature: JsonField<Temperature>) = apply {
+                this.temperature = temperature
+            }
+
+            fun additionalProperties(additionalProperties: Map<String, JsonValue>) = apply {
+                this.additionalProperties.clear()
+                putAllAdditionalProperties(additionalProperties)
+            }
+
+            fun putAdditionalProperty(key: String, value: JsonValue) = apply {
+                additionalProperties.put(key, value)
+            }
+
+            fun putAllAdditionalProperties(additionalProperties: Map<String, JsonValue>) = apply {
+                this.additionalProperties.putAll(additionalProperties)
+            }
+
+            fun removeAdditionalProperty(key: String) = apply { additionalProperties.remove(key) }
+
+            fun removeAllAdditionalProperties(keys: Set<String>) = apply {
+                keys.forEach(::removeAdditionalProperty)
+            }
+
+            /**
+             * Returns an immutable instance of [PhysicalProperties].
+             *
+             * Further updates to this [Builder] will not mutate the returned instance.
+             */
+            fun build(): PhysicalProperties =
+                PhysicalProperties(
+                    gravity,
+                    mass,
+                    radius,
+                    temperature,
+                    additionalProperties.toMutableMap(),
+                )
+        }
+
+        private var validated: Boolean = false
+
+        /**
+         * Validates that the types of all values in this object match their expected types
+         * recursively.
+         *
+         * This method is _not_ forwards compatible with new types from the API for existing fields.
+         *
+         * @throws GalaxyInvalidDataException if any value type in this object doesn't match its
+         *   expected type.
+         */
+        fun validate(): PhysicalProperties = apply {
+            if (validated) {
+                return@apply
+            }
+
+            gravity()
+            mass()
+            radius()
+            temperature()?.validate()
+            validated = true
+        }
+
+        fun isValid(): Boolean =
+            try {
+                validate()
+                true
+            } catch (e: GalaxyInvalidDataException) {
+                false
+            }
+
+        /**
+         * Returns a score indicating how many valid values are contained in this object
+         * recursively.
+         *
+         * Used for best match union deserialization.
+         */
+        internal fun validity(): Int =
+            (if (gravity.asKnown() == null) 0 else 1) +
+                (if (mass.asKnown() == null) 0 else 1) +
+                (if (radius.asKnown() == null) 0 else 1) +
+                (temperature.asKnown()?.validity() ?: 0)
+
+        @com.fasterxml.jackson.annotation.JsonPropertyOrder("average", "max", "min")
+        class Temperature
+        @JsonCreator(mode = JsonCreator.Mode.DISABLED)
+        private constructor(
+            private val average: JsonField<Float>,
+            private val max: JsonField<Float>,
+            private val min: JsonField<Float>,
+            private val additionalProperties: MutableMap<String, JsonValue>,
+        ) {
+
+            @JsonCreator
+            private constructor(
+                @JsonProperty("average")
+                @ExcludeMissing
+                average: JsonField<Float> = JsonMissing.of(),
+                @JsonProperty("max") @ExcludeMissing max: JsonField<Float> = JsonMissing.of(),
+                @JsonProperty("min") @ExcludeMissing min: JsonField<Float> = JsonMissing.of(),
+            ) : this(average, max, min, mutableMapOf())
+
+            /**
+             * Average temperature in Kelvin
+             *
+             * @throws GalaxyInvalidDataException if the JSON field has an unexpected type (e.g. if
+             *   the server responded with an unexpected value).
+             */
+            fun average(): Float? = average.getNullable("average")
+
+            /**
+             * Maximum temperature in Kelvin
+             *
+             * @throws GalaxyInvalidDataException if the JSON field has an unexpected type (e.g. if
+             *   the server responded with an unexpected value).
+             */
+            fun max(): Float? = max.getNullable("max")
+
+            /**
+             * Minimum temperature in Kelvin
+             *
+             * @throws GalaxyInvalidDataException if the JSON field has an unexpected type (e.g. if
+             *   the server responded with an unexpected value).
+             */
+            fun min(): Float? = min.getNullable("min")
+
+            /**
+             * Returns the raw JSON value of [average].
+             *
+             * Unlike [average], this method doesn't throw if the JSON field has an unexpected type.
+             */
+            @JsonProperty("average") @ExcludeMissing fun _average(): JsonField<Float> = average
+
+            /**
+             * Returns the raw JSON value of [max].
+             *
+             * Unlike [max], this method doesn't throw if the JSON field has an unexpected type.
+             */
+            @JsonProperty("max") @ExcludeMissing fun _max(): JsonField<Float> = max
+
+            /**
+             * Returns the raw JSON value of [min].
+             *
+             * Unlike [min], this method doesn't throw if the JSON field has an unexpected type.
+             */
+            @JsonProperty("min") @ExcludeMissing fun _min(): JsonField<Float> = min
+
+            @JsonAnySetter
+            private fun putAdditionalProperty(key: String, value: JsonValue) {
+                additionalProperties.put(key, value)
+            }
+
+            @JsonAnyGetter
+            @ExcludeMissing
+            fun _additionalProperties(): Map<String, JsonValue> =
+                Collections.unmodifiableMap(additionalProperties)
+
+            fun toBuilder() = Builder().from(this)
+
+            companion object {
+
+                /** Returns a mutable builder for constructing an instance of [Temperature]. */
+                fun builder() = Builder()
+            }
+
+            /** A builder for [Temperature]. */
+            class Builder internal constructor() {
+
+                private var average: JsonField<Float> = JsonMissing.of()
+                private var max: JsonField<Float> = JsonMissing.of()
+                private var min: JsonField<Float> = JsonMissing.of()
+                private var additionalProperties: MutableMap<String, JsonValue> = mutableMapOf()
+
+                internal fun from(temperature: Temperature) = apply {
+                    average = temperature.average
+                    max = temperature.max
+                    min = temperature.min
+                    additionalProperties = temperature.additionalProperties.toMutableMap()
+                }
+
+                /** Average temperature in Kelvin */
+                fun average(average: Float) = average(JsonField.of(average))
+
+                /**
+                 * Sets [Builder.average] to an arbitrary JSON value.
+                 *
+                 * You should usually call [Builder.average] with a well-typed [Float] value
+                 * instead. This method is primarily for setting the field to an undocumented or not
+                 * yet supported value.
+                 */
+                fun average(average: JsonField<Float>) = apply { this.average = average }
+
+                /** Maximum temperature in Kelvin */
+                fun max(max: Float) = max(JsonField.of(max))
+
+                /**
+                 * Sets [Builder.max] to an arbitrary JSON value.
+                 *
+                 * You should usually call [Builder.max] with a well-typed [Float] value instead.
+                 * This method is primarily for setting the field to an undocumented or not yet
+                 * supported value.
+                 */
+                fun max(max: JsonField<Float>) = apply { this.max = max }
+
+                /** Minimum temperature in Kelvin */
+                fun min(min: Float) = min(JsonField.of(min))
+
+                /**
+                 * Sets [Builder.min] to an arbitrary JSON value.
+                 *
+                 * You should usually call [Builder.min] with a well-typed [Float] value instead.
+                 * This method is primarily for setting the field to an undocumented or not yet
+                 * supported value.
+                 */
+                fun min(min: JsonField<Float>) = apply { this.min = min }
+
+                fun additionalProperties(additionalProperties: Map<String, JsonValue>) = apply {
+                    this.additionalProperties.clear()
+                    putAllAdditionalProperties(additionalProperties)
+                }
+
+                fun putAdditionalProperty(key: String, value: JsonValue) = apply {
+                    additionalProperties.put(key, value)
+                }
+
+                fun putAllAdditionalProperties(additionalProperties: Map<String, JsonValue>) =
+                    apply {
+                        this.additionalProperties.putAll(additionalProperties)
+                    }
+
+                fun removeAdditionalProperty(key: String) = apply {
+                    additionalProperties.remove(key)
+                }
+
+                fun removeAllAdditionalProperties(keys: Set<String>) = apply {
+                    keys.forEach(::removeAdditionalProperty)
+                }
+
+                /**
+                 * Returns an immutable instance of [Temperature].
+                 *
+                 * Further updates to this [Builder] will not mutate the returned instance.
+                 */
+                fun build(): Temperature =
+                    Temperature(average, max, min, additionalProperties.toMutableMap())
+            }
+
+            private var validated: Boolean = false
+
+            /**
+             * Validates that the types of all values in this object match their expected types
+             * recursively.
+             *
+             * This method is _not_ forwards compatible with new types from the API for existing
+             * fields.
+             *
+             * @throws GalaxyInvalidDataException if any value type in this object doesn't match its
+             *   expected type.
+             */
+            fun validate(): Temperature = apply {
+                if (validated) {
+                    return@apply
+                }
+
+                average()
+                max()
+                min()
+                validated = true
+            }
+
+            fun isValid(): Boolean =
+                try {
+                    validate()
+                    true
+                } catch (e: GalaxyInvalidDataException) {
+                    false
+                }
+
+            /**
+             * Returns a score indicating how many valid values are contained in this object
+             * recursively.
+             *
+             * Used for best match union deserialization.
+             */
+            internal fun validity(): Int =
+                (if (average.asKnown() == null) 0 else 1) +
+                    (if (max.asKnown() == null) 0 else 1) +
+                    (if (min.asKnown() == null) 0 else 1)
+
+            override fun equals(other: Any?): Boolean {
+                if (this === other) {
+                    return true
+                }
+
+                return other is Temperature &&
+                    average == other.average &&
+                    max == other.max &&
+                    min == other.min &&
+                    additionalProperties == other.additionalProperties
+            }
+
+            private val hashCode: Int by lazy {
+                Objects.hash(average, max, min, additionalProperties)
+            }
+
+            override fun hashCode(): Int = hashCode
+
+            override fun toString() =
+                "Temperature{average=$average, max=$max, min=$min, additionalProperties=$additionalProperties}"
+        }
+
+        override fun equals(other: Any?): Boolean {
+            if (this === other) {
+                return true
+            }
+
+            return other is PhysicalProperties &&
+                gravity == other.gravity &&
+                mass == other.mass &&
+                radius == other.radius &&
+                temperature == other.temperature &&
+                additionalProperties == other.additionalProperties
+        }
+
+        private val hashCode: Int by lazy {
+            Objects.hash(gravity, mass, radius, temperature, additionalProperties)
+        }
+
+        override fun hashCode(): Int = hashCode
+
+        override fun toString() =
+            "PhysicalProperties{gravity=$gravity, mass=$mass, radius=$radius, temperature=$temperature, additionalProperties=$additionalProperties}"
+    }
+
+    /** Atmospheric composition */
+    @com.fasterxml.jackson.annotation.JsonPropertyOrder("compound", "percentage")
+    class Atmosphere
+    @JsonCreator(mode = JsonCreator.Mode.DISABLED)
+    private constructor(
+        private val compound: JsonField<String>,
+        private val percentage: JsonField<Float>,
+        private val additionalProperties: MutableMap<String, JsonValue>,
+    ) {
+
+        @JsonCreator
+        private constructor(
+            @JsonProperty("compound")
+            @ExcludeMissing
+            compound: JsonField<String> = JsonMissing.of(),
+            @JsonProperty("percentage")
+            @ExcludeMissing
+            percentage: JsonField<Float> = JsonMissing.of(),
+        ) : this(compound, percentage, mutableMapOf())
+
+        /**
+         * @throws GalaxyInvalidDataException if the JSON field has an unexpected type (e.g. if the
+         *   server responded with an unexpected value).
+         */
+        fun compound(): String? = compound.getNullable("compound")
+
+        /**
+         * @throws GalaxyInvalidDataException if the JSON field has an unexpected type (e.g. if the
+         *   server responded with an unexpected value).
+         */
+        fun percentage(): Float? = percentage.getNullable("percentage")
+
+        /**
+         * Returns the raw JSON value of [compound].
+         *
+         * Unlike [compound], this method doesn't throw if the JSON field has an unexpected type.
+         */
+        @JsonProperty("compound") @ExcludeMissing fun _compound(): JsonField<String> = compound
+
+        /**
+         * Returns the raw JSON value of [percentage].
+         *
+         * Unlike [percentage], this method doesn't throw if the JSON field has an unexpected type.
+         */
+        @JsonProperty("percentage") @ExcludeMissing fun _percentage(): JsonField<Float> = percentage
+
+        @JsonAnySetter
+        private fun putAdditionalProperty(key: String, value: JsonValue) {
+            additionalProperties.put(key, value)
+        }
+
+        @JsonAnyGetter
+        @ExcludeMissing
+        fun _additionalProperties(): Map<String, JsonValue> =
+            Collections.unmodifiableMap(additionalProperties)
+
+        fun toBuilder() = Builder().from(this)
+
+        companion object {
+
+            /** Returns a mutable builder for constructing an instance of [Atmosphere]. */
+            fun builder() = Builder()
+        }
+
+        /** A builder for [Atmosphere]. */
+        class Builder internal constructor() {
+
+            private var compound: JsonField<String> = JsonMissing.of()
+            private var percentage: JsonField<Float> = JsonMissing.of()
+            private var additionalProperties: MutableMap<String, JsonValue> = mutableMapOf()
+
+            internal fun from(atmosphere: Atmosphere) = apply {
+                compound = atmosphere.compound
+                percentage = atmosphere.percentage
+                additionalProperties = atmosphere.additionalProperties.toMutableMap()
+            }
+
+            fun compound(compound: String) = compound(JsonField.of(compound))
+
+            /**
+             * Sets [Builder.compound] to an arbitrary JSON value.
+             *
+             * You should usually call [Builder.compound] with a well-typed [String] value instead.
+             * This method is primarily for setting the field to an undocumented or not yet
+             * supported value.
+             */
+            fun compound(compound: JsonField<String>) = apply { this.compound = compound }
+
+            fun percentage(percentage: Float) = percentage(JsonField.of(percentage))
+
+            /**
+             * Sets [Builder.percentage] to an arbitrary JSON value.
+             *
+             * You should usually call [Builder.percentage] with a well-typed [Float] value instead.
+             * This method is primarily for setting the field to an undocumented or not yet
+             * supported value.
+             */
+            fun percentage(percentage: JsonField<Float>) = apply { this.percentage = percentage }
+
+            fun additionalProperties(additionalProperties: Map<String, JsonValue>) = apply {
+                this.additionalProperties.clear()
+                putAllAdditionalProperties(additionalProperties)
+            }
+
+            fun putAdditionalProperty(key: String, value: JsonValue) = apply {
+                additionalProperties.put(key, value)
+            }
+
+            fun putAllAdditionalProperties(additionalProperties: Map<String, JsonValue>) = apply {
+                this.additionalProperties.putAll(additionalProperties)
+            }
+
+            fun removeAdditionalProperty(key: String) = apply { additionalProperties.remove(key) }
+
+            fun removeAllAdditionalProperties(keys: Set<String>) = apply {
+                keys.forEach(::removeAdditionalProperty)
+            }
+
+            /**
+             * Returns an immutable instance of [Atmosphere].
+             *
+             * Further updates to this [Builder] will not mutate the returned instance.
+             */
+            fun build(): Atmosphere =
+                Atmosphere(compound, percentage, additionalProperties.toMutableMap())
+        }
+
+        private var validated: Boolean = false
+
+        /**
+         * Validates that the types of all values in this object match their expected types
+         * recursively.
+         *
+         * This method is _not_ forwards compatible with new types from the API for existing fields.
+         *
+         * @throws GalaxyInvalidDataException if any value type in this object doesn't match its
+         *   expected type.
+         */
+        fun validate(): Atmosphere = apply {
+            if (validated) {
+                return@apply
+            }
+
+            compound()
+            percentage()
+            validated = true
+        }
+
+        fun isValid(): Boolean =
+            try {
+                validate()
+                true
+            } catch (e: GalaxyInvalidDataException) {
+                false
+            }
+
+        /**
+         * Returns a score indicating how many valid values are contained in this object
+         * recursively.
+         *
+         * Used for best match union deserialization.
+         */
+        internal fun validity(): Int =
+            (if (compound.asKnown() == null) 0 else 1) +
+                (if (percentage.asKnown() == null) 0 else 1)
+
+        override fun equals(other: Any?): Boolean {
+            if (this === other) {
+                return true
+            }
+
+            return other is Atmosphere &&
+                compound == other.compound &&
+                percentage == other.percentage &&
+                additionalProperties == other.additionalProperties
+        }
+
+        private val hashCode: Int by lazy {
+            Objects.hash(compound, percentage, additionalProperties)
+        }
+
+        override fun hashCode(): Int = hashCode
+
+        override fun toString() =
+            "Atmosphere{compound=$compound, percentage=$percentage, additionalProperties=$additionalProperties}"
+    }
+
     override fun equals(other: Any?): Boolean {
         if (this === other) {
             return true
@@ -211,14 +2163,14 @@ private constructor(
 
         return other is PlanetUpdateParams &&
             planetId == other.planetId &&
-            planet == other.planet &&
+            body == other.body &&
             additionalHeaders == other.additionalHeaders &&
             additionalQueryParams == other.additionalQueryParams
     }
 
     override fun hashCode(): Int =
-        Objects.hash(planetId, planet, additionalHeaders, additionalQueryParams)
+        Objects.hash(planetId, body, additionalHeaders, additionalQueryParams)
 
     override fun toString() =
-        "PlanetUpdateParams{planetId=$planetId, planet=$planet, additionalHeaders=$additionalHeaders, additionalQueryParams=$additionalQueryParams}"
+        "PlanetUpdateParams{planetId=$planetId, body=$body, additionalHeaders=$additionalHeaders, additionalQueryParams=$additionalQueryParams}"
 }
