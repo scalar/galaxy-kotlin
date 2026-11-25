@@ -185,7 +185,62 @@ internal class WebhookVerifier(
  * Why [WebhookVerifier] rejected a delivery.
  *
  * The generated webhook service never lets this escape: it becomes the cause of the SDK's own
- * webhook exception, so its message is what tells a caller which check failed.
+ * webhook exception, through [toWebhookExceptionCause], so its message is what tells a caller which
+ * check failed.
  */
 internal class WebhookVerificationException(message: String, cause: Throwable? = null) :
-    Exception(message, cause)
+    Exception(message, cause) {
+
+    /**
+     * The cause the SDK's webhook exception carries for this refusal.
+     *
+     * A caller who declares the Standard Webhooks library (`com.standardwebhooks:standardwebhooks`)
+     * gets that library's `com.standardwebhooks.exceptions.WebhookVerificationException` as the
+     * cause, carrying this refusal's message, stack trace and cause, so a check of the cause's type
+     * against the library's exception matches, as it did for SDKs that verified through it.
+     * Otherwise the cause is this exception. The library is looked up by name, so the SDK neither
+     * compiles nor runs against it, and the `-core` ProGuard rules keep its class.
+     */
+    fun toWebhookExceptionCause(): Exception {
+        val constructor = libraryException ?: return this
+        val compatible =
+            try {
+                constructor.newInstance(message)
+            } catch (e: ReflectiveOperationException) {
+                return this
+            }
+        compatible.stackTrace = stackTrace
+        // The library's exceptions never carry a cause, so the copy's is unset and takes this one's
+        // (the unparseable timestamp, or why the MAC could not be built), as the internal one does.
+        cause?.let {
+            try {
+                compatible.initCause(it)
+            } catch (e: IllegalStateException) {
+                // A library version that sets its own cause keeps it.
+            }
+        }
+        return compatible
+    }
+
+    private companion object {
+
+        // Looked up once, on the first refusal, and kept: null when the library is not on the
+        // classpath, or its exception is not the `Exception` subclass taking a message it has
+        // always been.
+        val libraryException: java.lang.reflect.Constructor<out Exception>? by lazy {
+            try {
+                Class.forName("com.standardwebhooks.exceptions.WebhookVerificationException")
+                    .asSubclass(Exception::class.java)
+                    .getConstructor(String::class.java)
+            } catch (e: ReflectiveOperationException) {
+                null
+            } catch (e: LinkageError) {
+                null
+            } catch (e: ClassCastException) {
+                null
+            } catch (e: SecurityException) {
+                null
+            }
+        }
+    }
+}

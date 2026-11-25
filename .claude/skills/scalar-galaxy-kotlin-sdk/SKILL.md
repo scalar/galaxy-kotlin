@@ -76,6 +76,7 @@ Non-success responses throw generated API errors. Error objects expose status, h
 
 ```kotlin
 import com.scalar.galaxy.errors.GalaxyServiceException
+import com.scalar.galaxy.models.planets.PlanetListParams
 
 try {
     val params = PlanetListParams.builder().limit(10L).offset(0L).build()
@@ -89,6 +90,7 @@ try {
 ## Requirements
 
 - Java 8 or later
+- Kotlin 1.8 or later, when calling the SDK from Kotlin
 
 ## Reference files
 
