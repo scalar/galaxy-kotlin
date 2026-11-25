@@ -87,5 +87,8 @@ private constructor(
 
     override fun hashCode(): Int = hashCode
 
-    override fun toString() = "UnwrapWebhookParams{body=$body, headers=$headers, secret=$secret}"
+    // The secret is masked: a params object that reaches a log line or an exception message by way
+    // of its `toString` must not carry the signing key with it.
+    override fun toString() =
+        "UnwrapWebhookParams{body=$body, headers=$headers, secret=${if (secret == null) null else "██"}}"
 }

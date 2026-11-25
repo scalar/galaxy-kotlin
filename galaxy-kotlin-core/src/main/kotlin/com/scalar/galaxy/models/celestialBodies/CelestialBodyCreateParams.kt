@@ -6,7 +6,7 @@ import com.scalar.galaxy.core.Params
 import com.scalar.galaxy.core.checkRequired
 import com.scalar.galaxy.core.http.Headers
 import com.scalar.galaxy.core.http.QueryParams
-import com.scalar.galaxy.models.planets.Planet
+import com.scalar.galaxy.models.planets.PlanetParam
 import java.util.Objects
 
 /**
@@ -15,13 +15,13 @@ import java.util.Objects
  */
 class CelestialBodyCreateParams
 private constructor(
-    private val celestialBody: CelestialBody,
+    private val celestialBody: CelestialBodyParam,
     private val additionalHeaders: Headers,
     private val additionalQueryParams: QueryParams,
 ) : Params {
 
     /** A celestial body which can be either a planet or a satellite */
-    fun celestialBody(): CelestialBody = celestialBody
+    fun celestialBody(): CelestialBodyParam = celestialBody
 
     /** Additional headers to send with the request. */
     fun _additionalHeaders(): Headers = additionalHeaders
@@ -47,7 +47,7 @@ private constructor(
     /** A builder for [CelestialBodyCreateParams]. */
     class Builder internal constructor() {
 
-        private var celestialBody: CelestialBody? = null
+        private var celestialBody: CelestialBodyParam? = null
         private var additionalHeaders: Headers.Builder = Headers.builder()
         private var additionalQueryParams: QueryParams.Builder = QueryParams.builder()
 
@@ -58,16 +58,16 @@ private constructor(
         }
 
         /** A celestial body which can be either a planet or a satellite */
-        fun celestialBody(celestialBody: CelestialBody) = apply {
+        fun celestialBody(celestialBody: CelestialBodyParam) = apply {
             this.celestialBody = celestialBody
         }
 
-        /** Alias for calling [celestialBody] with `CelestialBody.ofPlanet(planet)`. */
-        fun celestialBody(planet: Planet) = celestialBody(CelestialBody.ofPlanet(planet))
+        /** Alias for calling [celestialBody] with `CelestialBodyParam.ofPlanet(planet)`. */
+        fun celestialBody(planet: PlanetParam) = celestialBody(CelestialBodyParam.ofPlanet(planet))
 
-        /** Alias for calling [celestialBody] with `CelestialBody.ofSatellite(satellite)`. */
-        fun celestialBody(satellite: CelestialBody.Satellite) =
-            celestialBody(CelestialBody.ofSatellite(satellite))
+        /** Alias for calling [celestialBody] with `CelestialBodyParam.ofSatellite(satellite)`. */
+        fun celestialBody(satellite: CelestialBodyParam.Satellite) =
+            celestialBody(CelestialBodyParam.ofSatellite(satellite))
 
         fun additionalHeaders(additionalHeaders: Headers) = apply {
             this.additionalHeaders.clear()
@@ -187,7 +187,7 @@ private constructor(
             )
     }
 
-    fun _body(): CelestialBody = celestialBody
+    fun _body(): CelestialBodyParam = celestialBody
 
     override fun _headers(): Headers = additionalHeaders
 

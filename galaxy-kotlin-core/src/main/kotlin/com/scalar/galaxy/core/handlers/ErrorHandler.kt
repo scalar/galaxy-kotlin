@@ -7,6 +7,7 @@ import com.scalar.galaxy.core.JsonMissing
 import com.scalar.galaxy.core.JsonValue
 import com.scalar.galaxy.core.http.HttpResponse
 import com.scalar.galaxy.core.http.HttpResponse.Handler
+import com.scalar.galaxy.core.http.errorBodyPrefix
 import com.scalar.galaxy.errors.BadRequestException
 import com.scalar.galaxy.errors.InternalServerException
 import com.scalar.galaxy.errors.NotFoundException
@@ -16,18 +17,22 @@ import com.scalar.galaxy.errors.UnauthorizedException
 import com.scalar.galaxy.errors.UnexpectedStatusCodeException
 import com.scalar.galaxy.errors.UnprocessableEntityException
 
-internal fun errorBodyHandler(jsonMapper: JsonMapper): Handler<JsonValue> {
-    val handler = jsonHandler<JsonValue>(jsonMapper)
-
-    return object : Handler<JsonValue> {
+internal fun errorBodyHandler(jsonMapper: JsonMapper): Handler<JsonValue> =
+    object : Handler<JsonValue> {
         override fun handle(response: HttpResponse): JsonValue =
             try {
-                handler.handle(response)
+                // Only the first 64 KiB is read: an error body only becomes the exception, and a
+                // server could otherwise make the SDK hold one of any size. Cut short, it reads
+                // as no body, as a body that is not JSON does. The body is closed here: the error
+                // path never closes the response, and a body left half read holds its connection.
+                jsonMapper.readValue(
+                    response.body().use { it.errorBodyPrefix() },
+                    JsonValue::class.java,
+                )
             } catch (e: Exception) {
                 JsonMissing.of()
             }
     }
-}
 
 internal fun errorHandler(errorBodyHandler: Handler<JsonValue>): Handler<HttpResponse> =
     object : Handler<HttpResponse> {

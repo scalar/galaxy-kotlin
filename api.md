@@ -38,19 +38,19 @@ It's easy to say you know them all, but do you really? Retrieve all the planets 
 
 | Direction | Type |
 | --- | --- |
-| Request | [`PlanetListAllDataParams`](./galaxy-kotlin-core/src/main/kotlin/com/scalar/galaxy/models/planets/PlanetListAllDataParams.kt) |
-| Response | [`PlanetListAllDataResponse`](./galaxy-kotlin-core/src/main/kotlin/com/scalar/galaxy/models/planets/PlanetListAllDataResponse.kt) |
+| Request | [`PlanetListParams`](./galaxy-kotlin-core/src/main/kotlin/com/scalar/galaxy/models/planets/PlanetListParams.kt) |
+| Response | [`PlanetListResponse`](./galaxy-kotlin-core/src/main/kotlin/com/scalar/galaxy/models/planets/PlanetListResponse.kt) |
 
 ```kotlin
 import com.scalar.galaxy.client.GalaxyClient
 import com.scalar.galaxy.client.okhttp.GalaxyOkHttpClient
-import com.scalar.galaxy.models.planets.PlanetListAllDataParams
+import com.scalar.galaxy.models.planets.PlanetListParams
 
 val client: GalaxyClient =
     GalaxyOkHttpClient.builder().bearerAuth(System.getenv("BEARER_AUTH")).build()
 
-val params = PlanetListAllDataParams.builder().limit(10L).offset(0L).build()
-val planet = client.planets().listAllData(params)
+val params = PlanetListParams.builder().limit(10L).offset(0L).build()
+val planet = client.planets().list(params)
 
 println(planet)
 ```
@@ -67,13 +67,12 @@ Time to play god and create a new planet. What do you think? Ah, don't think too
 ```kotlin
 import com.scalar.galaxy.client.GalaxyClient
 import com.scalar.galaxy.client.okhttp.GalaxyOkHttpClient
-import com.scalar.galaxy.models.planets.Planet
 import com.scalar.galaxy.models.planets.PlanetCreateParams
 
 val client: GalaxyClient =
     GalaxyOkHttpClient.builder().bearerAuth(System.getenv("BEARER_AUTH")).build()
 
-val params = PlanetCreateParams.builder().planet(Planet.builder().name("Mars").build()).build()
+val params = PlanetCreateParams.builder().name("Mars").build()
 val planet = client.planets().create(params)
 
 println(planet)
@@ -114,14 +113,12 @@ Sometimes you make mistakes, that's fine. No worries, you can update all planets
 ```kotlin
 import com.scalar.galaxy.client.GalaxyClient
 import com.scalar.galaxy.client.okhttp.GalaxyOkHttpClient
-import com.scalar.galaxy.models.planets.Planet
 import com.scalar.galaxy.models.planets.PlanetUpdateParams
 
 val client: GalaxyClient =
     GalaxyOkHttpClient.builder().bearerAuth(System.getenv("BEARER_AUTH")).build()
 
-val params =
-    PlanetUpdateParams.builder().planetId(1L).planet(Planet.builder().name("Mars").build()).build()
+val params = PlanetUpdateParams.builder().planetId(1L).name("Mars").build()
 val planet = client.planets().update(params)
 
 println(planet)
@@ -154,19 +151,19 @@ Got a crazy good photo of a planet? Share it with the world!
 
 | Direction | Type |
 | --- | --- |
-| Request | [`PlanetDelteImageParams`](./galaxy-kotlin-core/src/main/kotlin/com/scalar/galaxy/models/planets/PlanetDelteImageParams.kt) |
-| Response | [`PlanetDelteImageResponse`](./galaxy-kotlin-core/src/main/kotlin/com/scalar/galaxy/models/planets/PlanetDelteImageResponse.kt) |
+| Request | [`PlanetUploadImageParams`](./galaxy-kotlin-core/src/main/kotlin/com/scalar/galaxy/models/planets/PlanetUploadImageParams.kt) |
+| Response | [`PlanetUploadImageResponse`](./galaxy-kotlin-core/src/main/kotlin/com/scalar/galaxy/models/planets/PlanetUploadImageResponse.kt) |
 
 ```kotlin
 import com.scalar.galaxy.client.GalaxyClient
 import com.scalar.galaxy.client.okhttp.GalaxyOkHttpClient
-import com.scalar.galaxy.models.planets.PlanetDelteImageParams
+import com.scalar.galaxy.models.planets.PlanetUploadImageParams
 
 val client: GalaxyClient =
     GalaxyOkHttpClient.builder().bearerAuth(System.getenv("BEARER_AUTH")).build()
 
-val params = PlanetDelteImageParams.builder().planetId(1L).build()
-val planet = client.planets().delteImage(params)
+val params = PlanetUploadImageParams.builder().planetId(1L).build()
+val planet = client.planets().uploadImage(params)
 
 println(planet)
 ```
@@ -187,16 +184,20 @@ Stars, moons, comets, the occasional rogue asteroid — if it glows or drifts th
 ```kotlin
 import com.scalar.galaxy.client.GalaxyClient
 import com.scalar.galaxy.client.okhttp.GalaxyOkHttpClient
-import com.scalar.galaxy.models.celestialBodies.CelestialBody
 import com.scalar.galaxy.models.celestialBodies.CelestialBodyCreateParams
-import com.scalar.galaxy.models.planets.Planet
+import com.scalar.galaxy.models.celestialBodies.CelestialBodyParam
+import com.scalar.galaxy.models.planets.PlanetParam
 
 val client: GalaxyClient =
     GalaxyOkHttpClient.builder().bearerAuth(System.getenv("BEARER_AUTH")).build()
 
 val params =
     CelestialBodyCreateParams.builder()
-        .celestialBody(CelestialBody.ofPlanet(Planet.builder().name("Mars").build()))
+        .celestialBody(
+            CelestialBodyParam.ofPlanet(
+                PlanetParam.builder().name("Mars").build(),
+            ),
+        )
         .build()
 val celestialBody = client.celestialBodies().create(params)
 
@@ -248,16 +249,14 @@ Yeah, this is the boring security stuff. Just get your super secret token and mo
 import com.scalar.galaxy.client.GalaxyClient
 import com.scalar.galaxy.client.okhttp.GalaxyOkHttpClient
 import com.scalar.galaxy.models.authentication.AuthenticationCreateTokenParams
-import com.scalar.galaxy.models.authentication.Credentials
 
 val client: GalaxyClient =
     GalaxyOkHttpClient.builder().bearerAuth(System.getenv("BEARER_AUTH")).build()
 
 val params =
     AuthenticationCreateTokenParams.builder()
-        .credentials(
-            Credentials.builder().email("marc@scalar.com").password("i-love-scalar").build()
-        )
+        .email("marc@scalar.com")
+        .password("i-love-scalar")
         .build()
 val authentication = client.authentication().createToken(params)
 

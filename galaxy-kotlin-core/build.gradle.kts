@@ -21,7 +21,6 @@ dependencies {
     api("com.fasterxml.jackson.core:jackson-core:2.18.2")
     api("com.fasterxml.jackson.core:jackson-databind:2.18.2")
     api("com.google.errorprone:error_prone_annotations:2.33.0")
-    api("com.standardwebhooks:standardwebhooks:1.1.0")
     api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.0")
 
     implementation("com.fasterxml.jackson.core:jackson-annotations:2.18.2")

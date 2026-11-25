@@ -8,7 +8,8 @@ import com.scalar.galaxy.core.RequestOptions
 import com.scalar.galaxy.core.http.HttpResponseFor
 import com.scalar.galaxy.models.celestialBodies.CelestialBody
 import com.scalar.galaxy.models.celestialBodies.CelestialBodyCreateParams
-import com.scalar.galaxy.models.planets.Planet
+import com.scalar.galaxy.models.celestialBodies.CelestialBodyParam
+import com.scalar.galaxy.models.planets.PlanetParam
 
 /** Celestial bodies are the planets and satellites in the Scalar Galaxy. */
 interface CelestialBodyServiceAsync {
@@ -36,7 +37,7 @@ interface CelestialBodyServiceAsync {
 
     /** @see create */
     suspend fun create(
-        celestialBody: CelestialBody,
+        celestialBody: CelestialBodyParam,
         requestOptions: RequestOptions = RequestOptions.none(),
     ): CelestialBody =
         create(
@@ -46,15 +47,15 @@ interface CelestialBodyServiceAsync {
 
     /** @see create */
     suspend fun create(
-        planet: Planet,
+        planet: PlanetParam,
         requestOptions: RequestOptions = RequestOptions.none(),
-    ): CelestialBody = create(CelestialBody.ofPlanet(planet), requestOptions)
+    ): CelestialBody = create(CelestialBodyParam.ofPlanet(planet), requestOptions)
 
     /** @see create */
     suspend fun create(
-        satellite: CelestialBody.Satellite,
+        satellite: CelestialBodyParam.Satellite,
         requestOptions: RequestOptions = RequestOptions.none(),
-    ): CelestialBody = create(CelestialBody.ofSatellite(satellite), requestOptions)
+    ): CelestialBody = create(CelestialBodyParam.ofSatellite(satellite), requestOptions)
 
     /**
      * A view of [CelestialBodyServiceAsync] that provides access to raw HTTP responses for each
@@ -68,7 +69,7 @@ interface CelestialBodyServiceAsync {
          * The original service is not modified.
          */
         fun withOptions(
-            modifier: (ClientOptions.Builder) -> Unit
+            modifier: (ClientOptions.Builder) -> Unit,
         ): CelestialBodyServiceAsync.WithRawResponse
 
         /**
@@ -84,7 +85,7 @@ interface CelestialBodyServiceAsync {
         /** @see create */
         @MustBeClosed
         suspend fun create(
-            celestialBody: CelestialBody,
+            celestialBody: CelestialBodyParam,
             requestOptions: RequestOptions = RequestOptions.none(),
         ): HttpResponseFor<CelestialBody> =
             create(
@@ -95,16 +96,17 @@ interface CelestialBodyServiceAsync {
         /** @see create */
         @MustBeClosed
         suspend fun create(
-            planet: Planet,
+            planet: PlanetParam,
             requestOptions: RequestOptions = RequestOptions.none(),
-        ): HttpResponseFor<CelestialBody> = create(CelestialBody.ofPlanet(planet), requestOptions)
+        ): HttpResponseFor<CelestialBody> =
+            create(CelestialBodyParam.ofPlanet(planet), requestOptions)
 
         /** @see create */
         @MustBeClosed
         suspend fun create(
-            satellite: CelestialBody.Satellite,
+            satellite: CelestialBodyParam.Satellite,
             requestOptions: RequestOptions = RequestOptions.none(),
         ): HttpResponseFor<CelestialBody> =
-            create(CelestialBody.ofSatellite(satellite), requestOptions)
+            create(CelestialBodyParam.ofSatellite(satellite), requestOptions)
     }
 }

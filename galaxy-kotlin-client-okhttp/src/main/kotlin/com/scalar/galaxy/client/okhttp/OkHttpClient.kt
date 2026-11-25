@@ -105,7 +105,7 @@ class OkHttpClient internal constructor(private val okHttpClient: okhttp3.OkHttp
                         // Closed if the coroutine was cancelled before it could take the response.
                         continuation.resume(response) { response.close() }
                     }
-                }
+                },
             )
         }
 
@@ -178,6 +178,11 @@ class OkHttpClient internal constructor(private val okHttpClient: okhttp3.OkHttp
                 okhttp3.OkHttpClient.Builder()
                     // `RetryingHttpClient` handles retries if the user enabled them.
                     .retryOnConnectionFailure(false)
+                    // `RedirectingHttpClient` follows redirects itself: OkHttp strips only
+                    // `Authorization` on a cross-host hop, so an API key header, a cookie and a 307
+                    // body would follow a redirect anywhere, and it would follow https to http.
+                    .followRedirects(false)
+                    .followSslRedirects(false)
                     .connectTimeout(timeout.connect())
                     .readTimeout(timeout.read())
                     .writeTimeout(timeout.write())
@@ -207,7 +212,7 @@ class OkHttpClient internal constructor(private val okHttpClient: okhttp3.OkHttp
                                     maxIdleConnections,
                                     keepAliveDuration.toNanos(),
                                     TimeUnit.NANOSECONDS,
-                                )
+                                ),
                             )
                         } else {
                             check((maxIdleConnections != null) == (keepAliveDuration != null)) {
@@ -232,7 +237,7 @@ class OkHttpClient internal constructor(private val okHttpClient: okhttp3.OkHttp
                         // We usually make all our requests to the same host so it makes sense to
                         // raise the per-host limit to the overall limit.
                         dispatcher.maxRequestsPerHost = dispatcher.maxRequests
-                    }
+                    },
             )
     }
 }

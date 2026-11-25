@@ -33,8 +33,10 @@ internal class ProGuardCompatibilityTest {
         fun main(args: Array<String>) {
             val test = ProGuardCompatibilityTest()
             test.keepRulesAreOnTheClasspath()
+            test.httpMethodResolvesByName()
             test.clientResolvesEveryService()
             test.credentialsRoundtrips()
+            test.credentialsKeepsUnknownAndMissingFields()
             test.celestialBodyRoundtrips()
         }
     }
@@ -42,7 +44,15 @@ internal class ProGuardCompatibilityTest {
     @Test
     fun keepRulesAreOnTheClasspath() {
         assertNotNull(
-            javaClass.classLoader.getResourceAsStream("META-INF/proguard/galaxy-kotlin-core.pro")
+            javaClass.classLoader.getResourceAsStream("META-INF/proguard/galaxy-kotlin-core.pro"),
+        )
+    }
+
+    @Test
+    fun httpMethodResolvesByName() {
+        assertEquals(
+            com.scalar.galaxy.core.http.HttpMethod.GET,
+            com.scalar.galaxy.core.http.HttpMethod.valueOf("GET"),
         )
     }
 
@@ -60,6 +70,8 @@ internal class ProGuardCompatibilityTest {
                 .openIdConnect("My Open Id Connect")
                 .build()
 
+        assertEquals("GalaxyClientImpl", client.javaClass.simpleName)
+        assertEquals("GalaxyClientAsyncImpl", client.async().javaClass.simpleName)
         assertNotNull(client.planets())
         assertNotNull(client.celestialBodies())
         assertNotNull(client.authentication())
@@ -68,8 +80,7 @@ internal class ProGuardCompatibilityTest {
 
     @Test
     fun credentialsRoundtrips() {
-        val credentials =
-            Credentials.builder().email("marc@scalar.com").password("i-love-scalar").build()
+        val credentials = Credentials.builder().email("marc@scalar.com").build()
         val credentialsJson = jsonMapper().writeValueAsString(credentials)
 
         assertEquals(
@@ -77,14 +88,50 @@ internal class ProGuardCompatibilityTest {
             jsonMapper()
                 .writeValueAsString(
                     jsonMapper()
-                        .readValue(credentialsJson, object : TypeReference<Credentials>() {})
+                        .readValue(credentialsJson, object : TypeReference<Credentials>() {}),
+                ),
+        )
+    }
+
+    @Test
+    fun credentialsKeepsUnknownAndMissingFields() {
+        val credentials = Credentials.builder().email("marc@scalar.com").build()
+        val credentialsWire =
+            jsonMapper().readTree(jsonMapper().writeValueAsString(credentials))
+                as com.fasterxml.jackson.databind.node.ObjectNode
+        val credentialsDropped = credentialsWire.fieldNames().asSequence().firstOrNull()
+        if (credentialsDropped != null) credentialsWire.remove(credentialsDropped)
+        credentialsWire.replace(
+            "proguard_compatibility_unknown",
+            jsonMapper()
+                .readTree(
+                    "{\"boolean\":true,\"number\":1.5,\"string\":\"kept\",\"array\":[1,\"two\",null],\"object\":{\"nested\":false},\"null\":null}",
+                ),
+        )
+        val credentialsJson = jsonMapper().writeValueAsString(credentialsWire)
+
+        assertEquals(
+            jsonMapper().readTree(credentialsJson),
+            jsonMapper()
+                .readTree(
+                    jsonMapper()
+                        .writeValueAsString(
+                            jsonMapper()
+                                .readValue(
+                                    credentialsJson,
+                                    object : TypeReference<Credentials>() {},
+                                ),
+                        ),
                 ),
         )
     }
 
     @Test
     fun celestialBodyRoundtrips() {
-        val celestialBody = CelestialBody.ofPlanet(Planet.builder().name("Mars").build())
+        val celestialBody =
+            CelestialBody.ofPlanet(
+                Planet.builder().id(1L).name("Mars").build(),
+            )
         val celestialBodyJson = jsonMapper().writeValueAsString(celestialBody)
 
         assertEquals(
@@ -92,7 +139,7 @@ internal class ProGuardCompatibilityTest {
             jsonMapper()
                 .writeValueAsString(
                     jsonMapper()
-                        .readValue(celestialBodyJson, object : TypeReference<CelestialBody>() {})
+                        .readValue(celestialBodyJson, object : TypeReference<CelestialBody>() {}),
                 ),
         )
     }

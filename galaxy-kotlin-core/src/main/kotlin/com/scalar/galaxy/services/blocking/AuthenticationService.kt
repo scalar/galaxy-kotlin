@@ -10,7 +10,6 @@ import com.scalar.galaxy.models.authentication.AuthenticationCreateTokenParams
 import com.scalar.galaxy.models.authentication.AuthenticationCreateTokenResponse
 import com.scalar.galaxy.models.authentication.AuthenticationCreateUserParams
 import com.scalar.galaxy.models.authentication.AuthenticationListMeParams
-import com.scalar.galaxy.models.authentication.Credentials
 import com.scalar.galaxy.models.authentication.User
 
 /**
@@ -36,16 +35,6 @@ interface AuthenticationService {
         params: AuthenticationCreateTokenParams,
         requestOptions: RequestOptions = RequestOptions.none(),
     ): AuthenticationCreateTokenResponse
-
-    /** @see createToken */
-    fun createToken(
-        credentials: Credentials,
-        requestOptions: RequestOptions = RequestOptions.none(),
-    ): AuthenticationCreateTokenResponse =
-        createToken(
-            AuthenticationCreateTokenParams.builder().credentials(credentials).build(),
-            requestOptions,
-        )
 
     /** Time to create a user account, eh? */
     fun createUser(
@@ -74,7 +63,7 @@ interface AuthenticationService {
          * The original service is not modified.
          */
         fun withOptions(
-            modifier: (ClientOptions.Builder) -> Unit
+            modifier: (ClientOptions.Builder) -> Unit,
         ): AuthenticationService.WithRawResponse
 
         /**
@@ -86,17 +75,6 @@ interface AuthenticationService {
             params: AuthenticationCreateTokenParams,
             requestOptions: RequestOptions = RequestOptions.none(),
         ): HttpResponseFor<AuthenticationCreateTokenResponse>
-
-        /** @see createToken */
-        @MustBeClosed
-        fun createToken(
-            credentials: Credentials,
-            requestOptions: RequestOptions = RequestOptions.none(),
-        ): HttpResponseFor<AuthenticationCreateTokenResponse> =
-            createToken(
-                AuthenticationCreateTokenParams.builder().credentials(credentials).build(),
-                requestOptions,
-            )
 
         /**
          * Returns a raw HTTP response for `post /user/signup`, but is otherwise the same as
