@@ -40,7 +40,10 @@ interface WebhookServiceAsync {
      * without headers, one replayed from storage, parsed as-is.
      *
      * @throws GalaxyInvalidDataException if the body could not be parsed.
-     * @throws GalaxyWebhookException if the webhook signature could not be verified
+     * @throws GalaxyWebhookException if the webhook signature could not be verified or the secret
+     *   is not valid
+     * @throws GalaxyException if the params carry headers but no secret is set on them or the
+     *   client
      */
     fun unwrap(unwrapParams: UnwrapWebhookParams): UnwrapWebhookEvent
 

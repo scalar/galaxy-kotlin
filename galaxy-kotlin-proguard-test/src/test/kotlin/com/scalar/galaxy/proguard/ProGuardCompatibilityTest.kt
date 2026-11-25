@@ -33,8 +33,10 @@ internal class ProGuardCompatibilityTest {
         fun main(args: Array<String>) {
             val test = ProGuardCompatibilityTest()
             test.keepRulesAreOnTheClasspath()
+            test.httpMethodResolvesByName()
             test.clientResolvesEveryService()
             test.credentialsRoundtrips()
+            test.credentialsKeepsUnknownAndMissingFields()
             test.celestialBodyRoundtrips()
         }
     }
@@ -43,6 +45,14 @@ internal class ProGuardCompatibilityTest {
     fun keepRulesAreOnTheClasspath() {
         assertNotNull(
             javaClass.classLoader.getResourceAsStream("META-INF/proguard/galaxy-kotlin-core.pro"),
+        )
+    }
+
+    @Test
+    fun httpMethodResolvesByName() {
+        assertEquals(
+            com.scalar.galaxy.core.http.HttpMethod.GET,
+            com.scalar.galaxy.core.http.HttpMethod.valueOf("GET"),
         )
     }
 
@@ -60,6 +70,8 @@ internal class ProGuardCompatibilityTest {
                 .openIdConnect("My Open Id Connect")
                 .build()
 
+        assertEquals("GalaxyClientImpl", client.javaClass.simpleName)
+        assertEquals("GalaxyClientAsyncImpl", client.async().javaClass.simpleName)
         assertNotNull(client.planets())
         assertNotNull(client.celestialBodies())
         assertNotNull(client.authentication())
@@ -77,6 +89,39 @@ internal class ProGuardCompatibilityTest {
                 .writeValueAsString(
                     jsonMapper()
                         .readValue(credentialsJson, object : TypeReference<Credentials>() {}),
+                ),
+        )
+    }
+
+    @Test
+    fun credentialsKeepsUnknownAndMissingFields() {
+        val credentials = Credentials.builder().email("marc@scalar.com").build()
+        val credentialsWire =
+            jsonMapper().readTree(jsonMapper().writeValueAsString(credentials))
+                as com.fasterxml.jackson.databind.node.ObjectNode
+        val credentialsDropped = credentialsWire.fieldNames().asSequence().firstOrNull()
+        if (credentialsDropped != null) credentialsWire.remove(credentialsDropped)
+        credentialsWire.replace(
+            "proguard_compatibility_unknown",
+            jsonMapper()
+                .readTree(
+                    "{\"boolean\":true,\"number\":1.5,\"string\":\"kept\",\"array\":[1,\"two\",null],\"object\":{\"nested\":false},\"null\":null}",
+                ),
+        )
+        val credentialsJson = jsonMapper().writeValueAsString(credentialsWire)
+
+        assertEquals(
+            jsonMapper().readTree(credentialsJson),
+            jsonMapper()
+                .readTree(
+                    jsonMapper()
+                        .writeValueAsString(
+                            jsonMapper()
+                                .readValue(
+                                    credentialsJson,
+                                    object : TypeReference<Credentials>() {},
+                                ),
+                        ),
                 ),
         )
     }

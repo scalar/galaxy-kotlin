@@ -23,8 +23,13 @@
 -keep class com.fasterxml.jackson.core.type.TypeReference { *; }
 -keep class * extends com.fasterxml.jackson.core.type.TypeReference { *; }
 
-# Keep the generated SDK classes; `@ExcludeMissing` and the value filter it names are reachable only through annotations.
--keep class com.scalar.galaxy.** { *; }
+# `@ExcludeMissing` and the value filter it names are reachable only from annotation values, so nothing
+# else keeps them. Without both, every property a caller left unset is serialized and throws.
+-keep,allowobfuscation @interface com.scalar.galaxy.core.ExcludeMissing
+-keep,allowobfuscation class com.scalar.galaxy.core.JsonField$IsMissing {
+    <init>();
+    public boolean equals(java.lang.Object);
+}
 
 # Jackson uses reflection to access our class serializers and deserializers.
 -keep @com.fasterxml.jackson.databind.annotation.JsonSerialize class com.scalar.galaxy.** { *; }
@@ -34,4 +39,29 @@
 -keepclassmembers class com.scalar.galaxy.** {
     <init>(...);
     @com.fasterxml.jackson.annotation.* *;
+}
+
+# Jackson's Kotlin module reads constructor defaults from `kotlin.Metadata`, and R8 keeps that metadata
+# only on classes a `-keep` rule matches. Without this, a property absent from the JSON is read back as
+# null instead of missing. This rule does not stop a class from being removed or renamed. It relies on
+# every creator parameter being a `JsonField`, `JsonValue` or `Map`, which keep their names.
+-keepclasseswithmembers,allowobfuscation,allowshrinking class com.scalar.galaxy.** {
+    @com.fasterxml.jackson.annotation.JsonCreator <init>(...);
+}
+
+# Each client stamps its own class name into the `User-Agent` header, so the two client
+# implementations keep their names. They can still be shrunk.
+-keepnames class com.scalar.galaxy.client.GalaxyClientImpl
+-keepnames class com.scalar.galaxy.client.GalaxyClientAsyncImpl
+
+# `Enum.valueOf` reaches `values()` through reflection, and the OkHttp transport resolves
+# `HttpMethod` by name. Without this ProGuard turns the class into one that is no longer an enum.
+-keepclassmembers enum com.scalar.galaxy.** {
+    public static **[] values();
+    public static ** valueOf(java.lang.String);
+}
+
+# The webhook verifier looks this up by name to keep it as the cause of a refused delivery.
+-keep class com.standardwebhooks.exceptions.WebhookVerificationException {
+    <init>(java.lang.String);
 }

@@ -7,7 +7,6 @@ import com.scalar.galaxy.core.ClientOptions
 import com.scalar.galaxy.core.UnwrapWebhookParams
 import com.scalar.galaxy.core.WebhookVerificationException
 import com.scalar.galaxy.core.WebhookVerifier
-import com.scalar.galaxy.core.checkRequired
 import com.scalar.galaxy.core.getRequiredHeader
 import com.scalar.galaxy.core.http.Headers
 import com.scalar.galaxy.errors.GalaxyException
@@ -38,7 +37,11 @@ class WebhookServiceImpl internal constructor(private val clientOptions: ClientO
         val headers = unwrapParams.headers()
         if (headers != null) {
             try {
-                val webhookSecret = checkRequired("webhookSecret", unwrapParams.secret())
+                val webhookSecret =
+                    unwrapParams.secret()
+                        ?: throw GalaxyException(
+                            "The webhook secret must either be set on the client class, or passed to this method",
+                        )
 
                 val headersMap =
                     headers.names().associateWith { name -> headers.values(name) }.toMap()
@@ -50,7 +53,9 @@ class WebhookServiceImpl internal constructor(private val clientOptions: ClientO
                     clientOptions.clock.millis() / 1000,
                 )
             } catch (e: WebhookVerificationException) {
-                throw GalaxyWebhookException(e.message, e)
+                throw GalaxyWebhookException(e.message, e.toWebhookExceptionCause())
+            } catch (e: IllegalArgumentException) {
+                throw GalaxyWebhookException("Invalid webhook secret", e)
             }
         } else if (unwrapParams.secret() != null) {
             throw GalaxyWebhookException(
@@ -81,7 +86,7 @@ class WebhookServiceImpl internal constructor(private val clientOptions: ClientO
             val verifier = WebhookVerifier(webhookSecret)
             verifier.verify(unwrapParams.body(), headersMap, clientOptions.clock.millis() / 1000)
         } catch (e: WebhookVerificationException) {
-            throw GalaxyWebhookException(e.message, e)
+            throw GalaxyWebhookException(e.message, e.toWebhookExceptionCause())
         } catch (e: IllegalArgumentException) {
             throw GalaxyWebhookException("Invalid webhook secret", e)
         }
@@ -106,7 +111,7 @@ class WebhookServiceImpl internal constructor(private val clientOptions: ClientO
             val verifier = WebhookVerifier(webhookSecret)
             verifier.verify(unwrapParams.body(), headersMap, clientOptions.clock.millis() / 1000)
         } catch (e: WebhookVerificationException) {
-            throw GalaxyWebhookException(e.message, e)
+            throw GalaxyWebhookException(e.message, e.toWebhookExceptionCause())
         } catch (e: IllegalArgumentException) {
             throw GalaxyWebhookException("Invalid webhook secret", e)
         }
